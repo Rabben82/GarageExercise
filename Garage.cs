@@ -1,15 +1,21 @@
-﻿using GarageExercise.Vehicles;
-using System.Drawing;
+﻿using System.Drawing;
+using GarageExercise.Entities;
 
 namespace GarageExercise;
 
 public class Garage<T> where T : Vehicle
 {
     private readonly Vehicle[] vehicleArray;
-    private Vehicle sum;
     public Garage(int sizeGarage)
     {
-        vehicleArray = new Vehicle[sizeGarage];
+        if (sizeGarage > 3)
+        {
+            vehicleArray = new Vehicle[sizeGarage];
+        }
+        else
+        {
+            UserInterface.ConsoleMessage("The Garage need's to hold moore than 3 parking-spots");
+        }
     }
 
     public IEnumerable<Vehicle> VehiclesInGarage()
@@ -38,6 +44,17 @@ public class Garage<T> where T : Vehicle
         {
             // Handle the case where the vehicle couldn't be added (e.g., garage is full)
             Console.WriteLine("The garage is full. Cannot add the vehicle.");
+        }
+
+    }
+    public void FillRemainingSlotsWithEmptyVehicles(Vehicle vehicle)
+    {
+        for (int i = 0; i < vehicleArray.Length; i++)
+        {
+            if (vehicleArray[i] == null)
+            {
+                vehicleArray[i] = vehicle; // Initialize with an empty vehicle
+            }
         }
     }
 }

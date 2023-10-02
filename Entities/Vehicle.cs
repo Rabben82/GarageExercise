@@ -1,12 +1,15 @@
-﻿namespace GarageExercise.Vehicles;
+﻿namespace GarageExercise.Entities;
 
-public class Vehicle 
+public class Vehicle
 {
     public string Model { get; set; }
     public string RegistrationNumber { get; set; }
     public string Color { get; set; }
     public int NumberOfWheels { get; set; }
     public int ProductionYear { get; set; }
+
+    private static int instanceCount;
+    public int InstanceCount { get; set; }
 
     public Vehicle(string model, string registrationNumber, string color, int numberOfWheels, int productionYear)
     {
@@ -15,6 +18,7 @@ public class Vehicle
         Color = color;
         NumberOfWheels = numberOfWheels;
         ProductionYear = productionYear;
+        //InstanceCount = ;
     }
 
     public override string ToString()

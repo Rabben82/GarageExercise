@@ -8,8 +8,10 @@ namespace GarageExercise
         
         static void Main(string[] args)
         {
-            GarageHandler garageHandler = new GarageHandler();
-            Manager manager = new Manager(garageHandler);
+            IUi iUi = new UserInterface();
+            Garage<Vehicle> garage = new Garage<Vehicle>(iUi);
+            GarageHandler garageHandler = new GarageHandler(iUi);
+            Manager manager = new Manager(garageHandler, iUi);
             manager.Run();
         }
     }

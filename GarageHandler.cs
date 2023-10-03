@@ -5,75 +5,26 @@ namespace GarageExercise;
 public class GarageHandler
 {
     public Garage<Vehicle> garage;
-    //private bool getName = true;
-    private int validNumber;
-
-    public void Run()
-    {
-        UserInterface.ConsoleMessage("Hi and welcome to the Garage!" +
-                                     "\nHow many cars do you wanna store in the garage?");
-
-        validNumber = UserInterface.ReturnValidNumber();
-        Initialize(validNumber);
-
-        UserInterface.ClearConsole();
-
-        UserInterface.ConsoleMessage("What do you wanna do today?\n" +
-                                     "\n1. List vehicle types and see how many of each type are currently parked." +
-                                     "\n2. List Parked Cars.");
-
-        validNumber = UserInterface.ReturnValidNumber();
-
-        Menu();
-    }
-
-    private void Menu()
-    {
-        switch (validNumber)
-        {
-            case 1:
-                UserInterface.ClearConsole();
-                UserInterface.ConsoleMessage("Number Of Parked Vehicles Based On Type!\n");
-
-                var numberOfCars = GetNrOfCarsInGarage();
-                PrintResultToConsole(numberOfCars);
-                break;
-            case 2:
-                UserInterface.ClearConsole();
-                UserInterface.ConsoleMessage("Parked Cars Full Specification!\n");
-
-                var listCars = ListCarsWithoutDuplicates();
-                PrintResultToConsole(listCars);
-                break;
-            default:
-                Console.WriteLine("Not on the list");
-                break;
-        }
-    }
-
-    public void PrintResultToConsole(IEnumerable<string> result)
-    {
-        foreach (var objects in result)
-        {
-            UserInterface.ConsoleMessage(objects);
-        }
-    }
+    private int vehicleIndex;
+    //private Vehicle vehicle = new Vehicle();
 
     public void Initialize(int sizeOfGarage)
     {
         garage = new Garage<Vehicle>(sizeOfGarage);
+
         Bus bus = new Bus("Mercedes", "abc1202", "grey", 6, 1978);
         Car car = new Car("Wolksvagen", "kla1394", "red", 4, 1994);
         Car carTwo = new Car("Wolksvagen", "kla1394", "red", 4, 1994);
         Motorcycle motorcycle = new Motorcycle("Suzuki", "agt1323", "purple", 3, 1987);
+
         AvailableParkingSlot availableParkingSlot = new AvailableParkingSlot("Available", "Available", "Available", 0, 0);
 
-        garage.AddVehicleToGarage(bus);
-        garage.AddVehicleToGarage(car);
-        garage.AddVehicleToGarage(carTwo);
-        garage.AddVehicleToGarage(motorcycle);
+        AddVehicleToGarage(bus);
+        AddVehicleToGarage(car);
+        AddVehicleToGarage(carTwo);
+        AddVehicleToGarage(motorcycle);
 
-        garage.FillRemainingSlotsWithEmptyVehicles(availableParkingSlot);
+        FillRemainingSlotsWithEmptyVehicles(availableParkingSlot);
     }
     public IEnumerable<string> GetNrOfCarsInGarage()
     {
@@ -93,7 +44,6 @@ public class GarageHandler
             {
                 nameCounts[name]++;
             }
-
         }
 
         foreach (var kvp in nameCounts)
@@ -101,33 +51,108 @@ public class GarageHandler
             string name = kvp.Key;
             int count = kvp.Value;
 
-            if (name == "AvailableParkingSlot")
+            if (name != "AvailableParkingSlot")
             {
-                yield return $"\nAvailable parking slot's, {count}";
-                break;
+                // Construct the itemText based on the 'getNames' parameter.
+                yield return $"Vehicle Type: {name}, Parked: {count}";
             }
-            // Construct the itemText based on the 'getNames' parameter.
-
-            yield return $"Vehicle Type: {name}, Parked: {count}";
         }
     }
 
     public IEnumerable<string> ListCarsWithoutDuplicates()
     {
         var retrieveVehicle = garage.VehiclesInGarage();
-        var printedVehicleTypes = new HashSet<string>();
+        //var printedVehicleTypes = new HashSet<string>();
 
         foreach (var item in retrieveVehicle)
         {
-            string vehicleType = item.GetType().Name;
+            //string vehicleType = item.GetType().Name;
 
-            if (!printedVehicleTypes.Contains(vehicleType))
+            if (item.Model != "Available")
             {
-                printedVehicleTypes.Add(vehicleType);
-
-                // Print the vehicle type and InstanceCount (assuming it's an integer property).
+               
                 yield return $"{item}";
             }
         }
     }
+    public void AddVehicleToGarage(Vehicle vehicle)
+    {
+        bool added = false; // Initialize a flag to track whether the vehicle has been added
+
+        for (int i = 0; i < garage.vehicleArray.Length; i++)
+        {
+            if (garage.vehicleArray[i] == null) // Check if the slot is empty
+            {
+                garage.vehicleArray[i] = vehicle; // Add the vehicle to the empty slot
+                added = true; // Set the flag to indicate that the vehicle has been added
+                break; // Exit the loop after adding the vehicle
+            }
+        }
+
+        if (!added)
+        {
+            // Handle the case where the vehicle couldn't be added (e.g., garage is full)
+            UserInterface.ConsoleMessageWrite("The garage is full. Cannot add the vehicle.");
+        }
+    }
+    public void FillRemainingSlotsWithEmptyVehicles(Vehicle vehicle)
+    {
+        for (int i = 0; i < garage.vehicleArray.Length; i++)
+        {
+            if (garage.vehicleArray[i] == null)
+            {
+                garage.vehicleArray[i] = vehicle; // Initialize with an empty vehicle
+            }
+        }
+    }
+
+    public void RemoveVehicle()
+    {
+        var sum = garage.VehiclesInGarage();
+        vehicleIndex = 0;
+
+        foreach (var objects in sum)
+        {
+            vehicleIndex++;
+
+            UserInterface.ConsoleMessageWriteLine($"{vehicleIndex}. {objects}");
+        }
+
+        UserInterface.ConsoleMessageWrite("\nChoose the parking slot number of the vehicle in the list you wanna remove!" +
+                                          "\n\nYour Choice: ");
+        var validNumber = UserInterface.ReturnValidNumber();
+
+        garage.vehicleArray[validNumber - 1] = new AvailableParkingSlot("Available", "Available", "Available", 0, 0);
+
+    }
+
+    
+
+    public void AddVehicle(Vehicle vehicle)
+    {
+        UserInterface.ClearConsole();
+
+        var sum = garage.VehiclesInGarage();
+        vehicleIndex = 0;
+
+        foreach (var objects in sum)
+        {
+            vehicleIndex++;
+
+            UserInterface.ConsoleMessageWriteLine($"{vehicleIndex}. {objects}");
+        }
+
+        UserInterface.ConsoleMessageWrite("\nChoose the available parking slot number you wanna park the car!" +
+                                          "\n\nYour Choice: ");
+        var validNumber = UserInterface.ReturnValidNumber();
+
+        garage.vehicleArray[validNumber -1] = vehicle;
+
+        UserInterface.ConsoleMessageWrite($"\nYou Have Added:\n{vehicle}\nTo Parking-Slot: {validNumber}");
+
+    }
+    //public void SearchByRegistrationNumber()
+    //{
+    //    garage.vehicleArray.Where(n => Equals())
+    //}
 }

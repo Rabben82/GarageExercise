@@ -17,7 +17,7 @@ namespace GarageExercise.Entities
 
         public override string ToString()
         {
-            return $"\nAvailable parking slot's {instanceCounter}";
+            return $"Available Parking Slot";
         }
     }
 }

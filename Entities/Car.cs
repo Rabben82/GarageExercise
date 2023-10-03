@@ -8,13 +8,5 @@ public class Car : Vehicle
     {
         instanceCounter++;
         base.InstanceCount = instanceCounter;
-
     }
-
-    //public override string ToString()
-    //{
-    //    return base.ToString() + $"Instance Count: {instanceCounter}";
-    //}
-
-
 }

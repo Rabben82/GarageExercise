@@ -7,10 +7,7 @@ public class Vehicle
     public string Color { get; set; }
     public int NumberOfWheels { get; set; }
     public int ProductionYear { get; set; }
-
-    private static int instanceCount;
     public int InstanceCount { get; set; }
-
     public Vehicle(string model, string registrationNumber, string color, int numberOfWheels, int productionYear)
     {
         Model = model;
@@ -18,11 +15,10 @@ public class Vehicle
         Color = color;
         NumberOfWheels = numberOfWheels;
         ProductionYear = productionYear;
-        //InstanceCount = ;
     }
 
     public override string ToString()
     {
-        return $"Model: {Model}, Registration NR: {RegistrationNumber}, Color: {Color}, NR Of Wheels {NumberOfWheels}, Production Year: {ProductionYear}";
+        return $"Type: {this.GetType().Name}, Model: {Model}, Registration NR: {RegistrationNumber}, Color: {Color}, NR Of Wheels {NumberOfWheels}, Production Year: {ProductionYear}";
     }
 }

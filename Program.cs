@@ -9,12 +9,8 @@ namespace GarageExercise
         static void Main(string[] args)
         {
             GarageHandler garageHandler = new GarageHandler();
-            garageHandler.Run();
-
-
-
+            Manager manager = new Manager(garageHandler);
+            manager.Run();
         }
-
-        
     }
 }

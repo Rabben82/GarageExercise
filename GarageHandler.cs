@@ -12,10 +12,10 @@ public class GarageHandler
     {
         garage = new Garage<Vehicle>(sizeOfGarage);
 
-        Bus bus = new Bus("Mercedes", "abc1202", "grey", 6, 1978);
-        Car car = new Car("Wolksvagen", "kla1394", "red", 4, 1994);
-        Car carTwo = new Car("Wolksvagen", "kla1394", "red", 4, 1994);
-        Motorcycle motorcycle = new Motorcycle("Suzuki", "agt1323", "purple", 3, 1987);
+        Bus bus = new Bus("Mercedes", "abc1202", "grey", 6, 1978, 20);
+        Car car = new Car("wolksvagen", "kla1394", "red", 4, 1994, "Diesel");
+        Car carTwo = new Car("wolksvagen", "kla1394", "red", 4, 1994,"Gasoline");
+        Motorcycle motorcycle = new Motorcycle("Suzuki", "agt1323", "purple", 3, 1987, "125cc");
 
         AvailableParkingSlot availableParkingSlot = new AvailableParkingSlot("Available", "Available", "Available", 0, 0);
 
@@ -142,7 +142,7 @@ public class GarageHandler
             UserInterface.ConsoleMessageWriteLine($"{vehicleIndex}. {objects}");
         }
 
-        UserInterface.ConsoleMessageWrite("\nChoose the available parking slot number you wanna park the car!" +
+        UserInterface.ConsoleMessageWrite("\nChoose the available parking slot number you wanna park the vehicle!" +
                                           "\n\nYour Choice: ");
         var validNumber = UserInterface.ReturnValidNumber();
 
@@ -151,8 +151,102 @@ public class GarageHandler
         UserInterface.ConsoleMessageWrite($"\nYou Have Added:\n{vehicle}\nTo Parking-Slot: {validNumber}");
 
     }
-    //public void SearchByRegistrationNumber()
-    //{
-    //    garage.vehicleArray.Where(n => Equals())
-    //}
+    public void SearchByRegistrationNumber(string registrationNumber)
+    {
+        var matchingVehicles = garage.vehicleArray
+            .Where(vehicle => vehicle.RegistrationNumber == registrationNumber.ToLower());
+
+        if (matchingVehicles.Any())
+        {
+            UserInterface.ConsoleMessageWriteLine("Registration Number Found In The Garage:");
+
+            foreach (var vehicle in matchingVehicles)
+            {
+                UserInterface.ConsoleMessageWriteLine(vehicle.ToString());
+            }
+        }
+        else
+        {
+            UserInterface.ConsoleMessageWriteLine($"The Registration Number ({registrationNumber}) Isn't Found In The Garage.");
+        }
+
+    }
+
+    public void SearchByProperties(string[] properties)
+    {
+
+        foreach (var vehicle in garage.vehicleArray)
+        {
+            bool hasMatchingType = properties
+                .Any(property =>
+                    vehicle.GetType().Name.Equals(property.Trim(), StringComparison.OrdinalIgnoreCase));
+
+            bool hasMatchingModel = properties
+                .Any(property =>
+                    vehicle.Model.Equals(property.Trim(), StringComparison.OrdinalIgnoreCase));
+
+            bool hasMatchingRegistrationNumber = properties
+                .Any(property =>
+                    vehicle.RegistrationNumber.Equals(property.Trim(), StringComparison.OrdinalIgnoreCase));
+
+            bool hasMatchingColor = properties
+                .Any(property =>
+                    vehicle.Color.Equals(property.Trim(), StringComparison.OrdinalIgnoreCase));
+
+            bool hasMatchingWheels = properties
+                .Any(property =>
+                    int.TryParse(property, out int parsedValue) && // Try to parse as an integer
+                    vehicle.NumberOfWheels == parsedValue);
+
+            bool hasMatchingProductionYear = properties
+                .Any(property => int.TryParse(property, out int parsedValue) &&
+                                 vehicle.ProductionYear == parsedValue);
+
+            if (hasMatchingModel && hasMatchingRegistrationNumber && hasMatchingColor && hasMatchingModel && hasMatchingWheels && hasMatchingProductionYear)
+            {
+                Console.WriteLine(vehicle);
+            }
+            else if (hasMatchingRegistrationNumber && hasMatchingColor && hasMatchingModel && hasMatchingWheels && hasMatchingProductionYear)
+            {
+                Console.WriteLine(vehicle);
+            }
+            else if (hasMatchingColor && hasMatchingModel && hasMatchingWheels && hasMatchingProductionYear)
+            {
+                Console.WriteLine(vehicle);
+            }
+            else if (hasMatchingModel && hasMatchingWheels && hasMatchingProductionYear)
+            {
+                Console.WriteLine(vehicle);
+            }
+            else if (hasMatchingWheels && hasMatchingProductionYear)
+            {
+                Console.WriteLine(vehicle);
+            }
+            else if (hasMatchingType)
+            {
+                Console.WriteLine(vehicle);
+            }
+            else if (hasMatchingModel)
+            {
+                Console.WriteLine(vehicle);
+            }
+            else if (hasMatchingRegistrationNumber)
+            {
+                Console.WriteLine(vehicle);
+            }
+            else if (hasMatchingColor)
+            {
+                Console.WriteLine(vehicle);
+            }
+            else if (hasMatchingWheels)
+            {
+                Console.WriteLine(vehicle);
+            }
+            else if (hasMatchingProductionYear)
+            {
+                Console.WriteLine(vehicle);
+            }
+        }
+
+    }
 }

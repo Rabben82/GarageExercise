@@ -8,15 +8,5 @@ public static class UserInterface
     public static void ClearConsole() => Console.Clear();
     public static void WaitForKeyPress() => Console.ReadKey();
 
-    public static string UserInput()
-    {
-        var userInput = Console.ReadLine();
-        if (!string.IsNullOrWhiteSpace(userInput))
-        {
-            return userInput;
-        }
-
-        throw new ArgumentException("Can't Be Null Or Whitespace");
-
-    }
+    public static string UserInput() => (Console.ReadLine() ?? throw new ArgumentException("Can't Be Null Or Whitespace")).Trim();
 }

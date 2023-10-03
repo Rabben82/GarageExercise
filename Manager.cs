@@ -10,13 +10,9 @@ namespace GarageExercise
     internal class Manager
     {
         private GarageHandler garageHandler;
-
-        //private Garage<Vehicle> garageParking;
-        //private bool getName = true;
         public Manager(GarageHandler handler)
         {
             garageHandler = handler;
-            //garageParking = garage;
         }
 
         private int validNumber;
@@ -44,6 +40,7 @@ namespace GarageExercise
                                              "\n3. Remove Vehicle." +
                                              "\n4. Add Vehicle." +
                                              "\n5. Search Vehicle By Registration Number." +
+                                             "\n6. Search Vehicle Based On Different Properties." +
                                              "\n\nEnter Your Choice: ");
                 validNumber = UserInterface.ReturnValidNumber();
                 MenuChoices();
@@ -82,7 +79,18 @@ namespace GarageExercise
                     break;
                 case 5:
                     UserInterface.ClearConsole();
-                    garageHandler.SearchByRegistrationNumber();
+                    UserInterface.ConsoleMessageWrite("Enter The Registration Number You Wanna Search For." +
+                                                      "\nEnter: ");
+                    var userInput = UserInterface.UserInput();
+                    garageHandler.SearchByRegistrationNumber(userInput);
+                    UserInterface.WaitForKeyPress();
+                    break;
+                case 6:
+                    UserInterface.ClearConsole();
+                    UserInterface.ConsoleMessageWriteLine("Enter Some Properties You Wanna Search For, example(all vehicles with black color and 4 wheels)");
+                    var prop = UserInterface.UserInput();
+                    string[] splitString = prop.Split(" ");
+                    garageHandler.SearchByProperties(splitString);
                     UserInterface.WaitForKeyPress();
                     break;
                 default:
@@ -90,9 +98,6 @@ namespace GarageExercise
                     break;
             }
         }
-
-        
-
         public void AddVehicleMenu()
         {
             UserInterface.ConsoleMessageWrite("What Type Of Vehicle Is To Be Added?\n" +
@@ -148,30 +153,39 @@ namespace GarageExercise
             switch (userSelectionA)
             {
                 case 1:
-                    Car newCar = new Car(model, registrationNumber, color, numberOfWheels, productionYear);
+                    UserInterface.ConsoleMessageWrite("Enter Fuel Type: ");
+                    var carFuelType = UserInterface.UserInput();
+                    Car newCar = new Car(model, registrationNumber, color, numberOfWheels, productionYear, carFuelType);
                     garageHandler.AddVehicle(newCar);
                     break;
                 case 2:
-                    Bus newBus = new Bus(model, registrationNumber, color, numberOfWheels, productionYear);
+                    UserInterface.ConsoleMessageWrite("Enter Number Of Seats: ");
+                    var numberOfSeats = UserInterface.ReturnValidNumber();
+                    Bus newBus = new Bus(model, registrationNumber, color, numberOfWheels, productionYear, numberOfSeats);
                     garageHandler.AddVehicle(newBus);
                     break;
                 case 3:
-                    Motorcycle newMotorcycle = new Motorcycle(model, registrationNumber, color, numberOfWheels, productionYear);
+                    UserInterface.ConsoleMessageWrite("Enter Horse Power: ");
+                    var horsePower = UserInterface.UserInput();
+                    Motorcycle newMotorcycle = new Motorcycle(model, registrationNumber, color, numberOfWheels, productionYear, horsePower);
                     garageHandler.AddVehicle(newMotorcycle);
                     break;
                 case 4:
-                    Boat newBoat = new Boat(model, registrationNumber, color, numberOfWheels, productionYear);
+                    UserInterface.ConsoleMessageWrite("Enter Length: ");
+                    var length = UserInterface.ReturnValidNumber();
+                    Boat newBoat = new Boat(model, registrationNumber, color, numberOfWheels, productionYear, length);
                     garageHandler.AddVehicle(newBoat);
                     break;
                 case 5:
-                    AirPlane newAirPlane = new AirPlane(model, registrationNumber, color, numberOfWheels, productionYear);
+                    UserInterface.ConsoleMessageWrite("Enter Number Of Engines: ");
+                    var airPlaneLength = UserInterface.ReturnValidNumber();
+                    AirPlane newAirPlane = new AirPlane(model, registrationNumber, color, numberOfWheels, productionYear,airPlaneLength);
                     garageHandler.AddVehicle(newAirPlane);
                     break;
                 default:
                     throw new IndexOutOfRangeException("You Have Chosen A Value That Doesn't Exist.");
             }
         }
-
         public void PrintResultToConsole(IEnumerable<string> result)
         {
             foreach (var objects in result)

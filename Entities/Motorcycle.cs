@@ -2,8 +2,17 @@
 
 public class Motorcycle : Vehicle
 {
-    public Motorcycle(string model, string registrationNumber, string color, int numberOfWheels, int productionYear) : base(model, registrationNumber, color, numberOfWheels, productionYear)
+    private static int instanceCounter;
+    public string HorsePower { get; set; }
+    public Motorcycle(string model, string registrationNumber, string color, int numberOfWheels, int productionYear, string horsePower) : base(model, registrationNumber, color, numberOfWheels, productionYear)
     {
-        base.InstanceCount++;
+        instanceCounter++;
+        base.InstanceCount = instanceCounter;
+        HorsePower = horsePower;
+    }
+
+    public override string ToString()
+    {
+        return $"{base.ToString()}, Horse Power: {HorsePower}";
     }
 }

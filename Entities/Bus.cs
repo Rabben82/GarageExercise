@@ -2,8 +2,17 @@
 
 public class Bus : Vehicle
 {
-    public Bus(string model, string registrationNumber, string color, int numberOfWheels, int productionYear) : base(model, registrationNumber, color, numberOfWheels, productionYear)
+    private static int instanceCounter;
+    public int NumberOfSeats { get; set; }
+    public Bus(string model, string registrationNumber, string color, int numberOfWheels, int productionYear, int numberOfSeats) : base(model, registrationNumber, color, numberOfWheels, productionYear)
     {
-        base.InstanceCount++;
+        instanceCounter++;
+        base.InstanceCount = instanceCounter;
+        NumberOfSeats = numberOfSeats;
+    }
+
+    public override string ToString()
+    {
+        return $"{base.ToString()}, Number Of Seats: {NumberOfSeats}";
     }
 }

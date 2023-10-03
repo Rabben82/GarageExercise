@@ -8,6 +8,11 @@ public class Vehicle
     public int NumberOfWheels { get; set; }
     public int ProductionYear { get; set; }
     public int InstanceCount { get; set; }
+
+    public Vehicle()
+    {
+        
+    }
     public Vehicle(string model, string registrationNumber, string color, int numberOfWheels, int productionYear)
     {
         Model = model;

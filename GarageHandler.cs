@@ -4,22 +4,22 @@ namespace GarageExercise;
 
 public class GarageHandler
 {
-    public Garage<Vehicle>? garage;
-    private int vehicleIndex;
-
+    private Garage<Vehicle> garage = default!;
     private readonly IUi ui;
-    //private Vehicle vehicle = new Vehicle();
+
     public GarageHandler(IUi ui)
     {
+        var list = new List<Vehicle>();
         this.ui = ui;
     }
+    //initializes the garage with some "default" values
     public void Initialize(int sizeOfGarage)
     {
         garage = new Garage<Vehicle>(sizeOfGarage);
 
-        Bus bus = new Bus("Scania", "EKY 055", "Silver", 8, 1994, 20);
-        Car car = new Car("Seat", "XTW 487", "White", 4, 2011, "Gasoline");
-        Car carTwo = new Car("Volkswagen", "YRT 217", "red", 4, 1998,"Diesel");
+        Bus bus = new Bus("Scania", "EKT 055", "Silver", 8, 1994, 20);
+        AirPlane car = new AirPlane("Boeing", "XTW 487", "White", 4, 2011, 2);
+        Car carTwo = new Car("Volkswagen", "YRT 217", "red", 4, 1998, "Diesel");
         Motorcycle motorcycle = new Motorcycle("Suzuki", "BTY 947", "Blue", 2, 1987, "175cc");
 
         AvailableParkingSlot availableParkingSlot = new AvailableParkingSlot("Available", "Available", "Available", 0, 0);
@@ -28,10 +28,9 @@ public class GarageHandler
         AddVehicleToGarage(car);
         AddVehicleToGarage(carTwo);
         AddVehicleToGarage(motorcycle);
-
-        FillRemainingSlotsWithEmptyVehicles(availableParkingSlot);
+        //This initializes the rest of the array with vehicle objects displaying its available to park
+        AvailableParkingSlots(availableParkingSlot);
     }
-
     public IEnumerable<string> GetTypeOfVehicleInGarage()
     {
         //Retrieves the vehicle types and how many of that type is in the garage
@@ -51,16 +50,15 @@ public class GarageHandler
     }
     private Dictionary<string, int> CalculateTypeCounts()
     {
-        var retrieveVehicle = garage.VehiclesInGarage();
         var typeCount = new Dictionary<string, int>(); //use dictionary to store "Key", the type of Vehicle and how many that has been instantiated "Value"
 
-        foreach (var items in retrieveVehicle) 
+        foreach (var items in garage)
         {
             string name = items.GetType().Name; //Stores the types in the name variable
 
             if (!typeCount.ContainsKey(name)) //If there are same type already i dont wanna display it, so it skips it but still increments it so i know how many of that type has been instantiated
             {
-                typeCount[name] = items.InstanceCount; 
+                typeCount[name] = items.InstanceCount;
             }
             else
             {
@@ -70,103 +68,99 @@ public class GarageHandler
 
         return typeCount;
     }
-
-    public IEnumerable<string> ListParkedCars()
+    public IEnumerable<string> DisplayParkedCars()
     {
-        var retrieveVehicle = garage.VehiclesInGarage();
-
-        foreach (var item in retrieveVehicle)
-        {
-
-            if (item.Model != "Available")
-            {
-               
-                yield return $"{item}";
-            }
-        }
+        //foreach (var item in garage)
+        //{
+        //    if (item.Model != "Available")
+        //    {
+        //        yield return $"{item}";
+        //    }
+        //}
+        return from item in garage where item.Model != "Available" select $"{item}";
     }
     public void AddVehicleToGarage(Vehicle vehicle)
     {
-        bool added = false; // Initialize a flag to track whether the vehicle has been added
-
-        for (int i = 0; i < garage.vehicleArray.Length; i++)
-        {
-            if (garage.vehicleArray[i] == null) // Check if the slot is empty
-            {
-                garage.vehicleArray[i] = vehicle; // Add the vehicle to the empty slot
-                added = true; // Set the flag to indicate that the vehicle has been added
-                break; // Exit the loop after adding the vehicle
-            }
-        }
-
-        if (!added)
-        {
-            // Handle the case where the vehicle couldn't be added (e.g., garage is full)
-            ui.ConsoleMessageWrite("The garage is full. Cannot add the vehicle.");
-        }
+        garage.Park(vehicle);
     }
-    public void FillRemainingSlotsWithEmptyVehicles(Vehicle vehicle)
+    public void AvailableParkingSlots(Vehicle emptyVehicle)
     {
-        for (int i = 0; i < garage.vehicleArray.Length; i++)
+        foreach (var items in garage)
         {
-            if (garage.vehicleArray[i] == null)
-            {
-                garage.vehicleArray[i] = vehicle; // Initialize with an empty vehicle
-            }
+            if (items == null) // Check if the slot is empty
+                garage.Park(emptyVehicle); // Add an empty vehicle to the empty slot using the Park method
         }
     }
-
     public void RemoveVehicle()
     {
-        var sum = garage.VehiclesInGarage();
-        vehicleIndex = 0;
+        DisplayParkedVehicles();
+        int selectedSlot = ui.GetUserSelection("\nChoose the parking slot number of the vehicle you want to remove:\n\nYour Choice: ");
+        RemoveVehicleFromGarage(selectedSlot);
+    }
+    private void DisplayParkedVehicles()
+    {
+        //var vehicles = garage..;
+        int vehicleIndex = 0;
 
-        foreach (var objects in sum)
+        foreach (var vehicle in garage)
         {
             vehicleIndex++;
-
-            ui.ConsoleMessageWriteLine($"{vehicleIndex}. {objects}");
+            ui.ConsoleMessageWriteLine($"{vehicleIndex}. {vehicle}");
         }
+    }
+    private void RemoveVehicleFromGarage(int selectedSlot)
+    {
+        int slotIndex = selectedSlot - 1; // Convert to 0-based index
 
-        ui.ConsoleMessageWrite("\nChoose the parking slot number of the vehicle in the list you wanna remove!" +
-                                          "\n\nYour Choice: ");
-        var validNumber = ui.ReturnValidNumber();
-        var removedVehicle = garage.vehicleArray[validNumber - 1];
+        if (IsParkingSlotInRange(slotIndex))
+        {
+            var vehicle = new AvailableParkingSlot("Available", "Available", "Available", 0, 0);
+            var removedVehicle = garage
+                .Where((vehicle, index) => index == slotIndex)
+                .FirstOrDefault();
 
-        garage.vehicleArray[validNumber - 1] = new AvailableParkingSlot("Available", "Available", "Available", 0, 0);
+            garage.Remove(vehicle, slotIndex);
 
-        ui.ConsoleMessageWriteLine($"You Have Removed: {removedVehicle}");
+            ui.ConsoleMessageWriteLine($"You Have Removed: {removedVehicle}");
+        }
+        else
+        {
+            ui.ConsoleMessageWriteLine("Invalid parking slot number. No vehicle was removed.");
+        }
     }
 
-    
+    private bool IsParkingSlotInRange(int slotIndex)
+    {
+        bool isParkingSlotInRange = slotIndex >= 0 && slotIndex < garage.ToArray().Length;
 
+        return isParkingSlotInRange;
+    }
     public void AddVehicle(Vehicle vehicle)
     {
-        ui.ClearConsole();
+        DisplayParkedVehicles();
+        var validNumber = ui.GetUserSelection("\nChoose an available parking slot number for the vehicle!\nYour Choice: ");
 
-        var sum = garage.VehiclesInGarage();
-        vehicleIndex = 0;
-
-        foreach (var objects in sum)
+        if (IsValueInRange(validNumber))
         {
-            vehicleIndex++;
-
-            ui.ConsoleMessageWriteLine($"{vehicleIndex}. {objects}");
+            garage.Park(vehicle, validNumber - 1);
+            ui.ConsoleMessageWriteLine($"\nYou Have Added:\n{vehicle}\nTo Parking-Slot: {validNumber}");
         }
-
-        ui.ConsoleMessageWrite("\nChoose the available parking slot number you wanna park the vehicle!" +
-                                          "\n\nYour Choice: ");
-        var validNumber = ui.ReturnValidNumber();
-
-        garage.vehicleArray[validNumber -1] = vehicle;
-
-        ui.ConsoleMessageWrite($"\nYou Have Added:\n{vehicle}\nTo Parking-Slot: {validNumber}");
-
+        else
+        {
+            ui.ConsoleMessageWriteLine("Invalid parking slot number. The vehicle was not parked.");
+        }
     }
+    private bool IsValueInRange(int validNumber)
+    {
+        bool isValid = validNumber >= 1 && validNumber <= garage.ToArray().Length;
+
+        return isValid;
+    }
+
     public void SearchByRegistrationNumber(string registrationNumber)
     {
-        var matchingVehicles = garage.vehicleArray
-            .Where(vehicle => vehicle.RegistrationNumber == registrationNumber.ToLower());
+        var matchingVehicles = garage
+            .Where(vehicle => vehicle.RegistrationNumber.ToLower().Replace(" ", "") == registrationNumber.ToLower().Replace(" ", ""));
 
         if (matchingVehicles.Any())
         {
@@ -183,82 +177,44 @@ public class GarageHandler
         }
 
     }
-
     public void SearchByProperties(string[] properties)
     {
+        Vehicle bestMatch = null;  // Initialize a variable to store the best match
+        int maxMatches = 0;        // Initialize the count of maximum matches
 
-        foreach (var vehicle in garage.vehicleArray)
+        foreach (var vehicle in garage)
         {
-            bool hasMatchingType = properties
-                .Any(property =>
-                    vehicle.GetType().Name.Equals(property.Trim(), StringComparison.OrdinalIgnoreCase));
+            int matchCount = 0;  // Initialize the count of matches for this vehicle
 
-            bool hasMatchingModel = properties
-                .Any(property =>
-                    vehicle.Model.Equals(property.Trim(), StringComparison.OrdinalIgnoreCase));
+            // Check for matches in all properties
+            if (properties.Any(property =>
+                    (string.IsNullOrEmpty(property) && vehicle.NumberOfWheels == 0) || // Handle empty properties as 0 wheels
+                    vehicle.Model.Equals(property.Trim(), StringComparison.OrdinalIgnoreCase) ||
+                    vehicle.RegistrationNumber.Equals(property.Trim(), StringComparison.OrdinalIgnoreCase) ||
+                    vehicle.Color.Equals(property.Trim(), StringComparison.OrdinalIgnoreCase) ||
+                    (int.TryParse(property, out int parsedValue) &&
+                     (vehicle.NumberOfWheels == parsedValue || vehicle.ProductionYear == parsedValue)) ||
+                    (string.IsNullOrEmpty(property) && vehicle.ProductionYear == 0))) // Handle empty properties as 0 production year
+            {
+                matchCount++;
+            }
 
-            bool hasMatchingRegistrationNumber = properties
-                .Any(property =>
-                    vehicle.RegistrationNumber.Equals(property.Trim(), StringComparison.OrdinalIgnoreCase));
-
-            bool hasMatchingColor = properties
-                .Any(property =>
-                    vehicle.Color.Equals(property.Trim(), StringComparison.OrdinalIgnoreCase));
-
-            bool hasMatchingWheels = properties
-                .Any(property =>
-                    int.TryParse(property, out int parsedValue) && // Try to parse as an integer
-                    vehicle.NumberOfWheels == parsedValue);
-
-            bool hasMatchingProductionYear = properties
-                .Any(property => int.TryParse(property, out int parsedValue) &&
-                                 vehicle.ProductionYear == parsedValue);
-
-            if (hasMatchingModel && hasMatchingRegistrationNumber && hasMatchingColor && hasMatchingModel && hasMatchingWheels && hasMatchingProductionYear)
+            // Check if the current vehicle is the best match so far
+            if (matchCount > maxMatches)
             {
-                ui.ConsoleMessageWriteLine(vehicle.ToString());
-            }
-            else if (hasMatchingRegistrationNumber && hasMatchingColor && hasMatchingModel && hasMatchingWheels && hasMatchingProductionYear)
-            {
-                ui.ConsoleMessageWriteLine(vehicle.ToString());
-            }
-            else if (hasMatchingColor && hasMatchingModel && hasMatchingWheels && hasMatchingProductionYear)
-            {
-                ui.ConsoleMessageWriteLine(vehicle.ToString());
-            }
-            else if (hasMatchingModel && hasMatchingWheels && hasMatchingProductionYear)
-            {
-                ui.ConsoleMessageWriteLine(vehicle.ToString());
-            }
-            else if (hasMatchingWheels && hasMatchingProductionYear)
-            {
-                ui.ConsoleMessageWriteLine(vehicle.ToString());
-            }
-            else if (hasMatchingType)
-            {
-                ui.ConsoleMessageWriteLine(vehicle.ToString());
-            }
-            else if (hasMatchingModel)
-            {
-                ui.ConsoleMessageWriteLine(vehicle.ToString());
-            }
-            else if (hasMatchingRegistrationNumber)
-            {
-                ui.ConsoleMessageWriteLine(vehicle.ToString());
-            }
-            else if (hasMatchingColor)
-            {
-                ui.ConsoleMessageWriteLine(vehicle.ToString());
-            }
-            else if (hasMatchingWheels)
-            {
-                ui.ConsoleMessageWriteLine(vehicle.ToString());
-            }
-            else if (hasMatchingProductionYear)
-            {
-                ui.ConsoleMessageWriteLine(vehicle.ToString());
+                bestMatch = vehicle;
+                maxMatches = matchCount;
             }
         }
 
+        // Display the best matching vehicle
+        if (bestMatch != null)
+        {
+            ui.ConsoleMessageWriteLine(bestMatch.ToString());
+        }
+        else
+        {
+            Console.WriteLine("No match found!");
+        }
     }
 }

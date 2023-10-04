@@ -1,35 +1,50 @@
-﻿using System.Drawing;
+﻿using System.Collections;
 using GarageExercise.Entities;
 
 namespace GarageExercise;
 
-public class Garage<T> where T : Vehicle
+public class Garage<T> : IEnumerable<T> where T : Vehicle
 {
-    public readonly Vehicle[] vehicleArray = Array.Empty<Vehicle>();
-    private readonly IUi? ui;
-
-    public Garage(IUi ui)
-    {
-        this.ui = ui;
-    }
+    private readonly T[] vehicleArray;
     public Garage(int sizeGarage)
     {
-        
-        if (sizeGarage > 3)
+        vehicleArray = new T[sizeGarage];
+    }
+    public void Park(T vehicle)
+    {
+        for (int i = 0; i < vehicleArray.Length; i++)
         {
-            vehicleArray = new Vehicle[sizeGarage];
+            if (vehicleArray[i] == null) // Check if the slot is empty
+            {
+                vehicleArray[i] = vehicle; // Add the vehicle to the empty slot
+                return; // Exit the method after adding the vehicle
+            }
         }
-        else
-        {
-            ui?.ConsoleMessageWrite("The Garage need's to hold moore than 3 parking-spots");
-        }
+        // Handle the case where the garage is full 
+        throw new ArgumentException("Garage is full!");
     }
 
-    public IEnumerable<Vehicle> VehiclesInGarage()
+    public void Park(T vehicle, int index)
+    {
+        vehicleArray[index] = vehicle;
+    }
+
+    public void Remove(T vehicle, int index)
+    {
+        vehicleArray[index] = vehicle;
+    }
+
+    public IEnumerator<T> GetEnumerator()
     {
         foreach (var objects in vehicleArray)
         {
+            //returnera bara parkerade fordon!!!!
             yield return objects;
         }
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 }

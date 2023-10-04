@@ -8,4 +8,5 @@ public interface IUi
     public void ClearConsole();
     public void WaitForKeyPress();
     public string UserInput();
+    public int GetUserSelection(string prompt);
 }

@@ -1,34 +1,43 @@
 ﻿using GarageExercise.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GarageExercise
 {
-    internal class Manager
+    internal class UiManager
     {
         private readonly GarageHandler garageHandler;
         private readonly IUi ui;
         private bool isRunning;
-        public Manager(GarageHandler handler, IUi ui)
+        public UiManager(GarageHandler handler, IUi ui)
         {
             garageHandler = handler;
             this.ui = ui;
         }
-
         public void Run()
         {
-            ui.ConsoleMessageWrite("Hi and welcome to the Garage!" +
-                                         "\nHow many vehicles do you wanna store in the garage?" +
-                                         "\n\nAmount: ");
+            bool isValidGarageSize = false;
 
-            var validNumber = ui.ReturnValidNumber();
-            garageHandler.Initialize(validNumber);
+            do
+            {
+                ui.ClearConsole();
+
+                ui.ConsoleMessageWrite("Hi and welcome to the Garage!" +
+                                       "\nHow many vehicles do you wanna store in the garage?" +
+                                       "\n\nAmount: ");
+
+                var validNumber = ui.ReturnValidNumber();
+                if (validNumber > 3 && validNumber < 15)
+                {
+                    isValidGarageSize = true;
+                    garageHandler.Initialize(validNumber);
+                }
+                else
+                {
+                    ui.ConsoleMessageWriteLine("\nThe Garage need's to hold moore than 3 parking-spots, but can't be bigger than 15.\nPress Any Key To Continue!");
+                    ui.WaitForKeyPress();
+                }
+            } while (!isValidGarageSize);
 
             Menu();
-
         }
         private void Menu()
         {
@@ -51,7 +60,6 @@ namespace GarageExercise
 
             } while (isRunning);
         }
-
         private void MenuChoices(int validNumber)
         {
             switch (validNumber)
@@ -60,7 +68,7 @@ namespace GarageExercise
                     PrintResultToConsole("Number Of Parked Vehicles Based On Type!\n", garageHandler.GetTypeOfVehicleInGarage());
                     break;
                 case 2:
-                    PrintResultToConsole("Parked Cars Full Specification!\n", garageHandler.ListParkedCars());
+                    PrintResultToConsole("Parked Cars Full Specification!\n", garageHandler.DisplayParkedCars());
                     break;
                 case 3:
                     ui.ClearConsole();
@@ -72,12 +80,17 @@ namespace GarageExercise
                     AddVehicleMenu();
                     break;
                 case 5:
+                    ui.ClearConsole();
                     ui.ConsoleMessageWrite("Enter The Registration Number You Want to Search For.\nEnter: ");
-                    garageHandler.SearchByRegistrationNumber(ui.UserInput());
+                    var registrationNumber = Validation.CheckRegistrationNumberInput(ui);
+                    garageHandler.SearchByRegistrationNumber(registrationNumber);
+                    ui.WaitForKeyPress();
                     break;
                 case 6:
+                    ui.ClearConsole();
                     ui.ConsoleMessageWriteLine("Enter Some Properties You Want to Search For (e.g., 'black 4 wheels'):");
                     garageHandler.SearchByProperties(ui.UserInput().Split(' '));
+                    ui.WaitForKeyPress();
                     break;
                 case 7:
                     isRunning = false;
@@ -88,7 +101,6 @@ namespace GarageExercise
                                                "\nPress Any Button To Try Again!");
                     ui.WaitForKeyPress();
                     break;
-
             }
         }
         public void AddVehicleMenu()
@@ -116,41 +128,46 @@ namespace GarageExercise
         public void AddVehicleProperties(int userSelectionA)
         {
             ui.ConsoleMessageWrite("Enter Vehicle Model: ");
-            var model = ui.UserInput();
+            var model = Validation.CheckModelNameInput(ui);
             ui.ConsoleMessageWrite("Enter Vehicle Registration Number: ");
-            var registrationNumber = ui.UserInput();
+            var registrationNumber = Validation.CheckRegistrationNumberInput(ui);
             ui.ConsoleMessageWrite("Enter Color Of Vehicle: ");
-            var color = ui.UserInput();
+            var color = Validation.CheckColorInput(ui);
             ui.ConsoleMessageWrite("Enter How Many Wheels The Vehicle Has: ");
-            var numberOfWheels = ui.ReturnValidNumber();
+            var numberOfWheels = Validation.CheckNumberOfWheelsInput(ui);
             ui.ConsoleMessageWrite("Enter The Production Year Of The Vehicle: ");
-            var productionYear = ui.ReturnValidNumber();
+            var productionYear = Validation.CheckProductionYearInput(ui);
 
             switch (userSelectionA)
             {
                 case 1:
                     ui.ConsoleMessageWrite("Enter Fuel Type: ");
-                    var carFuelType = ui.UserInput();
+                    var carFuelType = Validation.CheckCarFuelTypeInput(ui);
+                    ui.ClearConsole();
                     garageHandler.AddVehicle(new Car(model, registrationNumber, color, numberOfWheels, productionYear, carFuelType));
                     break;
                 case 2:
                     ui.ConsoleMessageWrite("Enter Number Of Seats: ");
                     var numberOfSeats = ui.ReturnValidNumber();
+                    ui.ClearConsole();
                     garageHandler.AddVehicle(new Bus(model, registrationNumber, color, numberOfWheels, productionYear, numberOfSeats));
                     break;
                 case 3:
                     ui.ConsoleMessageWrite("Enter Horse Power: ");
                     var horsePower = ui.UserInput();
+                    ui.ClearConsole();
                     garageHandler.AddVehicle(new Motorcycle(model, registrationNumber, color, numberOfWheels, productionYear, horsePower));
                     break;
                 case 4:
                     ui.ConsoleMessageWrite("Enter Length: ");
                     var length = ui.ReturnValidNumber();
+                    ui.ClearConsole();
                     garageHandler.AddVehicle(new Boat(model, registrationNumber, color, numberOfWheels, productionYear, length));
                     break;
                 case 5:
                     ui.ConsoleMessageWrite("Enter Number Of Engines: ");
                     var airPlaneLength = ui.ReturnValidNumber();
+                    ui.ClearConsole();
                     garageHandler.AddVehicle(new AirPlane(model, registrationNumber, color, numberOfWheels, productionYear, airPlaneLength));
                     break;
                 default:

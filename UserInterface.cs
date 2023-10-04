@@ -8,4 +8,9 @@ public class UserInterface : IUi
     public void ClearConsole() => Console.Clear();
     public void WaitForKeyPress() => Console.ReadKey();
     public string UserInput() => (Console.ReadLine() ?? throw new ArgumentException("Can't Be Null Or Whitespace")).Trim();
+    public int GetUserSelection(string prompt)
+    {
+        Console.Write(prompt);
+        return ReturnValidNumber();
+    }
 }

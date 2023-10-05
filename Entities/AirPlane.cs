@@ -10,10 +10,13 @@ public class AirPlane : Vehicle
         base.InstanceCount = instanceCounter;
         NumberOfEngines = numberOfEngines;
     }
-
     public override string ToString()
     {
         return $"{base.ToString()}, Number Of Engines: {NumberOfEngines}";
 
+    }
+    public static AirPlane CreateDefaultAirplane()
+    {
+        return new AirPlane("Boeing", "XTW 487", "White", 4, 2011, 2);
     }
 }

@@ -1,9 +1,40 @@
-﻿using System.Linq.Expressions;
+﻿using GarageExercise.Enums;
+using GarageExercise.UI;
 
-namespace GarageExercise;
+namespace GarageExercise.Validations;
 
 public static class Validation
 {
+    private static int number;
+    public static int CheckValidNumber()
+    {
+        bool isValid = false;
+
+        do
+        {
+            string userInput = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(userInput))
+            {
+                Console.Write("Error: Input cannot be blank.\nTry again: ");
+            }
+            else if (int.TryParse(userInput, out number))
+            {
+                isValid = true;
+            }
+            else
+            {
+                Console.Write("Error: Invalid input. Please enter a valid number.\nTry again: ");
+            }
+        } while (!isValid);
+
+        return number;
+    }
+    public static int CheckUserSelection(string prompt)
+    {
+        Console.Write(prompt);
+        return CheckValidNumber();
+    }
     public static string CheckModelNameInput(IUi ui)
     {
         string modelName;
@@ -56,7 +87,7 @@ public static class Validation
         int numberOfWheels;
         do
         {
-            numberOfWheels = ui.ReturnValidNumber();
+            numberOfWheels = CheckValidNumber();
             if (!IsValidNumberOfWheels(numberOfWheels))
             {
                 ui.ConsoleMessageWrite("You have entered an invalid number of wheels, it can't be bigger than 20" +
@@ -71,7 +102,7 @@ public static class Validation
         int productionYear;
         do
         {
-            productionYear = ui.ReturnValidNumber();
+            productionYear = CheckValidNumber();
             if (!IsValidProductionYear(productionYear))
             {
                 ui.ConsoleMessageWrite("It's not an valid production year, it should look like this (1990)" +
@@ -81,7 +112,6 @@ public static class Validation
 
         return productionYear;
     }
-
     public static bool IsValidModelName(string model)
     {
         bool isValidName = model.Length >= 3 && model.Length < 20;
@@ -124,22 +154,20 @@ public static class Validation
             carFuelType = ui.UserInput();
             if (!IsValidFuelType(carFuelType))
             {
-               ui.ConsoleMessageWrite("You haven't entered a valid fuel type, valid types are (gasoline, diesel. methanol)" +
-                                  "\nTry again: ");
+                ui.ConsoleMessageWrite("You haven't entered a valid fuel type, valid types are (gasoline, diesel. methanol)" +
+                                   "\nTry again: ");
             }
 
         } while (!IsValidFuelType(carFuelType));
 
         return carFuelType;
     }
-
     public static bool IsValidFuelType(string fuelType)
     {
-        List<FuelType> fuelTypes = Enum.GetValues(typeof(FuelType)).Cast<FuelType>().ToList(); //cast enum to list
+        List<FuelTypes> fuelTypes = Enum.GetValues(typeof(FuelTypes)).Cast<FuelTypes>().ToList(); //cast enum to list
 
         return fuelTypes.Any(enumFuelType =>
             enumFuelType.ToString().Equals(fuelType, StringComparison.OrdinalIgnoreCase));
     }
-
-
+    
 }

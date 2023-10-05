@@ -14,10 +14,13 @@ namespace GarageExercise.Entities
             instanceCounter++;
             base.InstanceCount = instanceCounter;
         }
-
         public override string ToString()
         {
             return $"Available Parking Slot";
+        }
+        public static AvailableParkingSlot CreateAvailableParkingSlot()
+        {
+            return new AvailableParkingSlot("Available", "Available", "Available", 0, 0000);
         }
     }
 }

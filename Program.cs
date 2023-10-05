@@ -1,5 +1,5 @@
-﻿using System.Threading.Channels;
-using GarageExercise.Entities;
+﻿using GarageExercise.Garage;
+using GarageExercise.UI;
 
 namespace GarageExercise
 {
@@ -10,6 +10,7 @@ namespace GarageExercise
             IUi iUi = new UserInterface();
             GarageHandler garageHandler = new GarageHandler(iUi);
             UiManager manager = new UiManager(garageHandler, iUi);
+
             manager.Run();
         }
     }

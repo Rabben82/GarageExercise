@@ -10,9 +10,12 @@ public class Motorcycle : Vehicle
         base.InstanceCount = instanceCounter;
         HorsePower = horsePower;
     }
-
     public override string ToString()
     {
         return $"{base.ToString()}, Horse Power: {HorsePower}";
+    }
+    public static Motorcycle CreateDefaultMotorcycle()
+    {
+        return new Motorcycle("Suzuki", "BTY 947", "Blue", 2, 1987, "175cc");
     }
 }

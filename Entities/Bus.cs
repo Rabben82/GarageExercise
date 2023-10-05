@@ -10,9 +10,13 @@ public class Bus : Vehicle
         base.InstanceCount = instanceCounter;
         NumberOfSeats = numberOfSeats;
     }
-
     public override string ToString()
     {
         return $"{base.ToString()}, Number Of Seats: {NumberOfSeats}";
+    }
+    //Default Bus that are being instantiated at runtime in the garage
+    public static Bus CreateDefaultBus()
+    {
+        return new Bus("Scania", "EKT 055", "Silver", 8, 1994, 20);
     }
 }

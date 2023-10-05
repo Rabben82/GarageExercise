@@ -10,9 +10,12 @@ public class Car : Vehicle
         base.InstanceCount = instanceCounter;
         FuelType = fuelType;
     }
-
     public override string ToString()
     {
         return $"{base.ToString()}, Fuel Type: {FuelType}";
+    }
+    public static Car CreateDefaultCar()
+    {
+        return new Car("Volkswagen", "YRT 217", "red", 4, 1998, "Diesel");
     }
 }

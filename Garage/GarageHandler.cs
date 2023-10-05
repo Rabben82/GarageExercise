@@ -53,7 +53,7 @@ public class GarageHandler
         foreach (var count in vehicleAmount)
         {
             //if (count.TypeName != "AvailableParkingSlot")
-                yield return $"{count.TypeName}: {count.Count}";
+            yield return $"{count.TypeName}: {count.Count}";
         }
     }
     public IEnumerable<string> DisplayParkedVehicles()
@@ -63,7 +63,7 @@ public class GarageHandler
     public void RemoveVehicle()
     {
         DisplayParkedVehiclesWithIndex();
-        int selectedSlot = Validation.CheckUserSelection("\nChoose the parking slot number of the vehicle you want to remove:\n\nYour Choice: ");
+        int selectedSlot = Validation.CheckUserSelection(ui,"\nChoose the parking slot number of the vehicle you want to remove:\n\nYour Choice: ");
         RemoveVehicleFromGarage(selectedSlot);
     }
     private void DisplayParkedVehiclesWithIndex()
@@ -85,7 +85,12 @@ public class GarageHandler
             var availableParkingSlot = AvailableParkingSlot.CreateAvailableParkingSlot();
             var removedVehicle = garage
                 .Where((vehicle, index) => index == slotIndex)
-                .FirstOrDefault();
+                .FirstOrDefault()!;
+            if (removedVehicle.GetType().Name == "AvailableParkingSlot")
+            {
+                ui.ConsoleMessageWrite("You can't remove an available parking slot!\nPress any key to continue.");
+                return;
+            }
             //replace the removed vehicle with available parking slot
             garage.Remove(availableParkingSlot, slotIndex);
 
@@ -99,22 +104,23 @@ public class GarageHandler
     public void AddVehicleByUserInput(Vehicle vehicle)
     {
         DisplayParkedVehiclesWithIndex();
-        var validNumber = Validation.CheckUserSelection("\nChoose an available parking slot number for the vehicle!\nYour Choice: ");
+        var validNumber = Validation.CheckUserSelection(ui, "\nChoose an available parking slot number for the vehicle!\nYour Choice: ");
+        var isFreeParkingSpot = garage.ElementAtOrDefault(validNumber)?.GetType().Name == "AvailableParkingSlot";
 
-        if (IsValueInRange(validNumber))
+        if (IsValueInRange(validNumber) && isFreeParkingSpot)
         {
             garage.Park(vehicle, validNumber - 1);// Convert to 0-based index
             ui.ConsoleMessageWriteLine($"\nYou Have Added:\n{vehicle}\nTo Parking-Slot: {validNumber}\nPress any key to continue.");
         }
         else
         {
-            ui.ConsoleMessageWriteLine("Invalid parking slot number. The vehicle was not parked.");
+            ui.ConsoleMessageWriteLine("Invalid parking slot number or not a free parking slot. The vehicle was not parked.");
         }
     }
     public void SearchByRegistrationNumber(string registrationNumber)
     {
         var matchingRegistrationNumber = garage
-            .Where(vehicle => vehicle.RegistrationNumber.ToLower().Replace(" ", "") == registrationNumber.ToLower().Replace(" ", ""));
+            .Where(vehicle => vehicle?.RegistrationNumber?.ToLower().Replace(" ", "") == registrationNumber.ToLower().Replace(" ", ""));
 
         if (matchingRegistrationNumber.Any())
         {
@@ -133,43 +139,49 @@ public class GarageHandler
     }
     public void SearchByProperties(string[] properties)
     {
-        Vehicle bestMatch = null;  // Initialize a variable to store the best match
-        int maxMatches = 0;        // Initialize the count of maximum matches
+        var matchingVehicles = GetMatchingVehicles(properties);
 
-        foreach (var vehicle in garage)
+        // Display the matching vehicles
+        if (matchingVehicles.Count > 0)
         {
-            int matchCount = 0;  // Initialize the count of matches for this vehicle
-
-            // Check for matches in all properties
-            if (properties.Any(property =>
-                    string.IsNullOrEmpty(property) && vehicle.NumberOfWheels == 0 || // Handle empty properties as 0 wheels
-                    vehicle.Model.Equals(property.Trim(), StringComparison.OrdinalIgnoreCase) ||
-                    vehicle.RegistrationNumber.Equals(property.Trim(), StringComparison.OrdinalIgnoreCase) ||
-                    vehicle.Color.Equals(property.Trim(), StringComparison.OrdinalIgnoreCase) ||
-                    int.TryParse(property, out int parsedValue) &&
-                     (vehicle.NumberOfWheels == parsedValue || vehicle.ProductionYear == parsedValue) ||
-                    string.IsNullOrEmpty(property) && vehicle.ProductionYear == 0)) // Handle empty properties as 0 production year
+            foreach (var matchedVehicle in matchingVehicles)
             {
-                matchCount++;
+                ui.ConsoleMessageWriteLine(matchedVehicle.GetType().Name == "AvailableParkingSlot"
+                    ? $"You entered an empty value, and that matches!\n{matchedVehicle}"
+                    : $"These properties matches your search!\n{matchedVehicle}");
             }
-
-            // Check if the current vehicle is the best match so far
-            if (matchCount > maxMatches)
-            {
-                bestMatch = vehicle;
-                maxMatches = matchCount;
-            }
-        }
-        // Display the best matching vehicle
-        if (bestMatch != null)
-        {
-            ui.ConsoleMessageWriteLine($"Found this vehicle based on your search!\n{bestMatch}");
         }
         else
         {
             ui.ConsoleMessageWriteLine("No match found!");
         }
     }
+
+    private List<Vehicle> GetMatchingVehicles(string[] properties)
+    {
+        List<Vehicle> matchingVehicles = new List<Vehicle>();
+
+        foreach (var vehicle in garage)
+        {
+            // Check for matches in all properties
+            if (properties.Any(property =>
+                    string.IsNullOrEmpty(property) && vehicle.NumberOfWheels == 0 ||
+                    vehicle.GetType().Name.Equals(property.Trim(), StringComparison.OrdinalIgnoreCase) ||
+                    vehicle.Model.Equals(property.Trim(), StringComparison.OrdinalIgnoreCase) ||
+                    vehicle.RegistrationNumber.Equals(property.Trim(), StringComparison.OrdinalIgnoreCase) ||
+                    vehicle.Color.Equals(property.Trim(), StringComparison.OrdinalIgnoreCase) ||
+                    int.TryParse(property, out int parsedValue) &&
+                    (vehicle.NumberOfWheels == parsedValue || vehicle.ProductionYear == parsedValue) ||
+                    string.IsNullOrEmpty(property) && vehicle.ProductionYear == 0))
+            {
+                // If any property matches, add the vehicle to the list of matching vehicles
+                matchingVehicles.Add(vehicle);
+            }
+        }
+
+        return matchingVehicles;
+    }
+
     private bool IsParkingSlotInRange(int slotIndex)
     {
         bool isParkingSlotInRange = slotIndex >= 0 && slotIndex < garage.ToArray().Length;

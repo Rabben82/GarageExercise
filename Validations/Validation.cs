@@ -6,17 +6,17 @@ namespace GarageExercise.Validations;
 public static class Validation
 {
     private static int number;
-    public static int CheckValidNumber()
+    public static int CheckValidNumber(IUi ui)
     {
         bool isValid = false;
 
         do
         {
-            string userInput = Console.ReadLine();
+            string userInput = Console.ReadLine() ?? throw new ArgumentException("Error: Value can't be blank!");
 
             if (string.IsNullOrWhiteSpace(userInput))
             {
-                Console.Write("Error: Input cannot be blank.\nTry again: ");
+                ui.ConsoleMessageWrite("Error: Input cannot be blank.\nTry again: ");
             }
             else if (int.TryParse(userInput, out number))
             {
@@ -24,16 +24,65 @@ public static class Validation
             }
             else
             {
-                Console.Write("Error: Invalid input. Please enter a valid number.\nTry again: ");
+                ui.ConsoleMessageWrite("Error: Invalid input. Please enter a valid number.\nTry again: ");
             }
         } while (!isValid);
 
         return number;
     }
-    public static int CheckUserSelection(string prompt)
+    public static int CheckValidNumber(IUi ui,int minValue, int maxValue)
     {
-        Console.Write(prompt);
-        return CheckValidNumber();
+        bool isValid = false;
+
+        do
+        {
+            string userInput = Console.ReadLine()!;
+
+            if (string.IsNullOrWhiteSpace(userInput))
+            {
+                ui.ConsoleMessageWrite($"Error: Input cannot be blank.\nTry again: ");
+            }
+            else if (int.TryParse(userInput, out number) && number >= minValue && number < maxValue)
+            {
+                isValid = true;
+            }
+            else
+            {
+                ui.ConsoleMessageWrite("You Have Entered A Value That's Out Of Range Of The Menu!" +
+                                       "\nTry again: ");
+            }
+        } while (!isValid);
+
+        return number;
+    }
+    public static (bool, int) CheckValidNumber(IUi ui, string prompt, int minValue, int maxValue)
+    {
+        bool isValid = false;
+
+        do
+        {
+            string userInput = ui.UserInput();
+
+            if (string.IsNullOrWhiteSpace(userInput))
+            {
+                ui.ConsoleMessageWrite($"Error: Input cannot be blank.\nTry again: ");
+            }
+            else if (int.TryParse(userInput, out number) && number > minValue && number < maxValue)
+            {
+                isValid = true;
+            }
+            else
+            {
+                ui.ConsoleMessageWrite(prompt);
+            }
+        } while (!isValid);
+
+        return (isValid, number);
+    }
+    public static int CheckUserSelection(IUi ui,string prompt)
+    {
+        ui.ConsoleMessageWrite(prompt);
+        return CheckValidNumber(ui);
     }
     public static string CheckModelNameInput(IUi ui)
     {
@@ -87,7 +136,7 @@ public static class Validation
         int numberOfWheels;
         do
         {
-            numberOfWheels = CheckValidNumber();
+            numberOfWheels = CheckValidNumber(ui);
             if (!IsValidNumberOfWheels(numberOfWheels))
             {
                 ui.ConsoleMessageWrite("You have entered an invalid number of wheels, it can't be bigger than 20" +
@@ -102,7 +151,7 @@ public static class Validation
         int productionYear;
         do
         {
-            productionYear = CheckValidNumber();
+            productionYear = CheckValidNumber(ui);
             if (!IsValidProductionYear(productionYear))
             {
                 ui.ConsoleMessageWrite("It's not an valid production year, it should look like this (1990)" +
@@ -164,10 +213,7 @@ public static class Validation
     }
     public static bool IsValidFuelType(string fuelType)
     {
-        List<FuelTypes> fuelTypes = Enum.GetValues(typeof(FuelTypes)).Cast<FuelTypes>().ToList(); //cast enum to list
-
-        return fuelTypes.Any(enumFuelType =>
-            enumFuelType.ToString().Equals(fuelType, StringComparison.OrdinalIgnoreCase));
+        return Enum.TryParse(fuelType.ToLower(), out FuelTypes fuel);
     }
-    
+
 }

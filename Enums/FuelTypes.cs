@@ -2,7 +2,7 @@
 
 public enum FuelTypes
 {
-    Gasoline,
-    Diesel,
-    Ethanol
+    gasoline,
+    diesel,
+    ethanol
 }

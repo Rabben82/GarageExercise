@@ -9,8 +9,7 @@ namespace GarageExercise.UI
         private readonly GarageHandler garageHandler;
         private readonly IUi ui;
         private bool isRunning;
-        private const int MinGarageSize = 3;
-        private const int MaxGarageSize = 15;
+
         public UiManager(GarageHandler handler, IUi ui)
         {
             garageHandler = handler;
@@ -18,7 +17,7 @@ namespace GarageExercise.UI
         }
         public void Run()
         {
-            bool isValidGarageSize = false;
+            var isValidGarageSize = (false, 0);
 
             do
             {
@@ -28,19 +27,12 @@ namespace GarageExercise.UI
                                        "\nHow many vehicles do you wanna store in the garage?" +
                                        "\n\nAmount: ");
 
-                var validNumber = Validation.CheckValidNumber();
+                isValidGarageSize = Validation.CheckValidNumber(ui, "Invalid garage size. Please enter a number between " +
+                                                                $"{GarageHelpers.MinGarageSize} and {GarageHelpers.MaxGarageSize}.\nTry again: ", GarageHelpers.MinGarageSize, GarageHelpers.MaxGarageSize);
 
-                if (validNumber > MinGarageSize &&  validNumber < MaxGarageSize)
-                {
-                    isValidGarageSize = true;
-                    garageHandler.Initialize(validNumber);
-                }
-                else
-                {
-                    ui.ConsoleMessageWriteLine("The Garage need's to hold moore than 3 parking-spots, but can't be bigger than 15.\nPress any key to try again!");
-                    ui.WaitForKeyPress();
-                }
-            } while (!isValidGarageSize);
+                garageHandler.Initialize(isValidGarageSize.Item2);
+
+            } while (!isValidGarageSize.Item1);
 
             Menu();
         }
@@ -60,7 +52,7 @@ namespace GarageExercise.UI
                                              "\n6. Search Vehicle Based On Different Properties." +
                                              "\n7. Quit!" +
                                              "\n\nEnter Your Choice: ");
-                var validNumber = Validation.CheckValidNumber();
+                var validNumber = Validation.CheckValidNumber(ui);
                 MenuChoices(validNumber);
 
             } while (isRunning);
@@ -118,19 +110,11 @@ namespace GarageExercise.UI
                                          "\n5. Airplane" +
                                          "\n\nEnter Your Choice: ");
 
-            var validNr = Validation.CheckValidNumber();
-            if (validNr is >= 1 and <= 5)
-            {
-                AddVehicleProperties(validNr);
-            }
-            else
-            {
-                ui.ConsoleMessageWriteLine("You Have Entered A Value That's Out Of Range!" +
-                                           "\nPress any key to continue!");
-                ui.WaitForKeyPress();
-            }
+            var validNr = Validation.CheckValidNumber(ui,GarageHelpers.MinMenuValue, GarageHelpers.MaxMenuValue); ;
+
+            AddVehicleProperties(validNr);
         }
-        public void AddVehicleProperties(int userSelectionA)
+        public void AddVehicleProperties(int validNr)
         {
             ui.ConsoleMessageWrite("Enter Vehicle Model: ");
             var model = Validation.CheckModelNameInput(ui);
@@ -143,7 +127,12 @@ namespace GarageExercise.UI
             ui.ConsoleMessageWrite("Enter The Production Year Of The Vehicle: ");
             var productionYear = Validation.CheckProductionYearInput(ui);
 
-            switch (userSelectionA)
+            AddVehiclePropertiesMenu(validNr, model, registrationNumber, color, numberOfWheels, productionYear);
+        }
+
+        public void AddVehiclePropertiesMenu(int userSelection, string model, string registrationNumber, string color, int numberOfWheels, int productionYear)
+        {
+            switch (userSelection)
             {
                 case 1:
                     ui.ConsoleMessageWrite("Enter Fuel Type: ");
@@ -154,7 +143,7 @@ namespace GarageExercise.UI
                     break;
                 case 2:
                     ui.ConsoleMessageWrite("Enter Number Of Seats: ");
-                    var numberOfSeats = Validation.CheckValidNumber();
+                    var numberOfSeats = Validation.CheckValidNumber(ui);
                     ui.ClearConsole();
                     garageHandler.AddVehicleByUserInput(new Bus(model, registrationNumber, color, numberOfWheels, productionYear, numberOfSeats));
                     ui.WaitForKeyPress();
@@ -168,14 +157,14 @@ namespace GarageExercise.UI
                     break;
                 case 4:
                     ui.ConsoleMessageWrite("Enter Length: ");
-                    var length = Validation.CheckValidNumber();
+                    var length = Validation.CheckValidNumber(ui);
                     ui.ClearConsole();
                     garageHandler.AddVehicleByUserInput(new Boat(model, registrationNumber, color, numberOfWheels, productionYear, length));
                     ui.WaitForKeyPress();
                     break;
                 case 5:
                     ui.ConsoleMessageWrite("Enter Number Of Engines: ");
-                    var airPlaneLength = Validation.CheckValidNumber();
+                    var airPlaneLength = Validation.CheckValidNumber(ui);
                     ui.ClearConsole();
                     garageHandler.AddVehicleByUserInput(new AirPlane(model, registrationNumber, color, numberOfWheels, productionYear, airPlaneLength));
                     ui.WaitForKeyPress();
@@ -184,6 +173,7 @@ namespace GarageExercise.UI
                     throw new IndexOutOfRangeException("You Have Chosen A Value That Doesn't Exist.");
             }
         }
+
         public void PrintResultToConsole(string prompt, IEnumerable<string> result)
         {
             ui.ClearConsole();

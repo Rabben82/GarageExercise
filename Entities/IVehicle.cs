@@ -2,10 +2,10 @@
 
 public interface IVehicle
 {
-    public string? Model { get; set; }
-    public string? RegistrationNumber { get; set; }
-    public string? Color { get; set; }
-    public int NumberOfWheels { get; set; }
-    public int ProductionYear { get; set; }
-    public int InstanceCount { get; set; }
+  string Model { get; set; }
+  string RegistrationNumber { get; set; }
+  string Color { get; set; }
+  int NumberOfWheels { get; set; }
+  int ProductionYear { get; set; }
+  int InstanceCount { get; set; }
 }

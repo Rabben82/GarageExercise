@@ -1,14 +1,15 @@
-﻿namespace GarageExercise.Entities;
+﻿using System.ComponentModel;
+
+namespace GarageExercise.Entities;
 
 public class Vehicle : IVehicle
 {
-    public string Model { get; set; } = string.Empty;
-    public string? RegistrationNumber { get; set; } = string.Empty;
-    public string? Color { get; set; } = string.Empty;
+    public string Model { get; set; }
+    public string RegistrationNumber { get; set; } 
+    public string Color { get; set; } 
     public int NumberOfWheels { get; set; }
     public int ProductionYear { get; set; }
     public int InstanceCount { get; set; }
-   
     public Vehicle(string model, string registrationNumber, string color, int numberOfWheels, int productionYear)
     {
         Model = model;

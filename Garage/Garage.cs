@@ -8,6 +8,10 @@ public class Garage<T> : IEnumerable<T> where T : Vehicle
     private readonly T[] vehicleArray;
     public Garage(int sizeGarage)
     {
+        if (sizeGarage < GarageHelpers.MinGarageSize && sizeGarage > GarageHelpers.MaxGarageSize)
+        {
+            throw new ArgumentOutOfRangeException($"Not a valid garage size!{sizeGarage}");
+        }
         vehicleArray = new T[sizeGarage];
     }
     //this method initializes the default cars at runtime
@@ -15,9 +19,9 @@ public class Garage<T> : IEnumerable<T> where T : Vehicle
     {
         for (int i = 0; i < vehicleArray.Length; i++)
         {
-            if (vehicleArray[i] != null) continue; 
-            vehicleArray[i] = vehicle; 
-            return; 
+            if (vehicleArray[i] != null) continue;
+            vehicleArray[i] = vehicle;
+            return;
         }
         // Handle the case where the garage is full 
         throw new ArgumentException("Garage is full!");

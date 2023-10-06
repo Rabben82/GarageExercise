@@ -1,4 +1,6 @@
-﻿using GarageExercise.Enums;
+﻿using GarageExercise.Entities;
+using GarageExercise.Enums;
+using GarageExercise.Garage;
 using GarageExercise.UI;
 
 namespace GarageExercise.Validations;
@@ -170,7 +172,18 @@ public static class Validation
     }
     public static bool IsValidFuelType(string fuelType)
     {
-        return Enum.TryParse(fuelType.ToLower(), out FuelTypes fuel);
+        return Enum.TryParse(fuelType.ToLower(), out FuelTypes _);
     }
+    public static bool IsParkingSlotInRange(int slotIndex, Garage<Vehicle> garage)
+    {
+        bool isParkingSlotInRange = slotIndex >= 0 && slotIndex < garage.ToArray().Length;
 
+        return isParkingSlotInRange;
+    }
+    public static bool IsValueInRange(int validNumber, Garage<Vehicle> garage)
+    {
+        bool isValid = validNumber >= 1 && validNumber <= garage.ToArray().Length;
+
+        return isValid;
+    }
 }

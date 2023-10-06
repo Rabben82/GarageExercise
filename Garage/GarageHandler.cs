@@ -4,7 +4,7 @@ using GarageExercise.Validations;
 
 namespace GarageExercise.Garage;
 
-public class GarageHandler
+public class GarageHandler : IGarageHandler
 {
     private Garage<Vehicle> garage = default!;
     private readonly IUi ui;
@@ -66,7 +66,8 @@ public class GarageHandler
         int selectedSlot = Validation.CheckValidNumber(ui,"\nChoose the parking slot number of the vehicle you want to remove:\n\nYour Choice: ");
         RemoveVehicleFromGarage(selectedSlot);
     }
-    private void DisplayParkedVehiclesWithIndex()
+
+    public void DisplayParkedVehiclesWithIndex()
     {
         int vehicleIndex = 0;
 
@@ -76,11 +77,12 @@ public class GarageHandler
             ui.ConsoleMessageWriteLine($"{vehicleIndex}. {vehicle}");
         }
     }
-    private void RemoveVehicleFromGarage(int selectedSlot)
+
+    public void RemoveVehicleFromGarage(int selectedSlot)
     {
         int slotIndex = selectedSlot - 1; // Convert to 0-based index
 
-        if (IsParkingSlotInRange(slotIndex))
+        if (Validation.IsParkingSlotInRange(slotIndex, garage))
         {
             var availableParkingSlot = AvailableParkingSlot.CreateAvailableParkingSlot();
             var removedVehicle = garage
@@ -107,7 +109,7 @@ public class GarageHandler
         var validNumber = Validation.CheckValidNumber(ui, "\nChoose an available parking slot number for the vehicle!\nYour Choice: ");
         var isFreeParkingSpot = garage.ElementAtOrDefault(validNumber -1)?.GetType().Name == "AvailableParkingSlot";
 
-        if (IsValueInRange(validNumber) && isFreeParkingSpot)
+        if (Validation.IsValueInRange(validNumber, garage) && isFreeParkingSpot)
         {
             garage.Park(vehicle, validNumber - 1);// Convert to 0-based index
             ui.ConsoleMessageWriteLine($"\nYou Have Added:\n{vehicle}\nTo Parking-Slot: {validNumber}\nPress any key to continue.");
@@ -157,7 +159,7 @@ public class GarageHandler
         }
     }
 
-    private List<Vehicle> GetMatchingVehicles(string[] properties)
+    public List<Vehicle> GetMatchingVehicles(string[] properties)
     {
         List<Vehicle> matchingVehicles = new List<Vehicle>();
 
@@ -180,18 +182,5 @@ public class GarageHandler
         }
 
         return matchingVehicles;
-    }
-
-    private bool IsParkingSlotInRange(int slotIndex)
-    {
-        bool isParkingSlotInRange = slotIndex >= 0 && slotIndex < garage.ToArray().Length;
-
-        return isParkingSlotInRange;
-    }
-    private bool IsValueInRange(int validNumber)
-    {
-        bool isValid = validNumber >= 1 && validNumber <= garage.ToArray().Length;
-
-        return isValid;
     }
 }

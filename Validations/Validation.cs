@@ -6,9 +6,11 @@ namespace GarageExercise.Validations;
 public static class Validation
 {
     private static int number;
-    public static int CheckValidNumber(IUi ui)
+    //this just parse a string to a number
+    public static int CheckValidNumber(IUi ui, string prompt ="")
     {
         bool isValid = false;
+        ui.ConsoleMessageWriteLine(prompt);
 
         do
         {
@@ -30,7 +32,8 @@ public static class Validation
 
         return number;
     }
-    public static int CheckValidNumber(IUi ui,int minValue, int maxValue)
+    //this parse a string to a valid number, but checks if its valid between a given range
+    public static int CheckValidNumber(IUi ui,int minValue, int maxValue, string prompt= "You have entered a value that's out of range")
     {
         bool isValid = false;
 
@@ -48,13 +51,14 @@ public static class Validation
             }
             else
             {
-                ui.ConsoleMessageWrite("You Have Entered A Value That's Out Of Range Of The Menu!" +
+                ui.ConsoleMessageWrite($"{prompt}, needs to be between {minValue} - {maxValue}" +
                                        "\nTry again: ");
             }
         } while (!isValid);
 
         return number;
     }
+    //sam as above but this method returns both an int and a bool
     public static (bool, int) CheckValidNumber(IUi ui, string prompt, int minValue, int maxValue)
     {
         bool isValid = false;
@@ -79,24 +83,24 @@ public static class Validation
 
         return (isValid, number);
     }
-    public static int CheckUserSelection(IUi ui,string prompt)
-    {
-        ui.ConsoleMessageWrite(prompt);
-        return CheckValidNumber(ui);
-    }
-    public static string CheckModelNameInput(IUi ui)
+    public static string CheckValidStringLengthInput(IUi ui, int minValue, int maxValue, string prompt)
     {
         string modelName;
+        bool isValid = false;
         do
         {
             modelName = ui.UserInput();
-            if (!IsValidModelName(modelName))
+            if (modelName.Length < minValue || modelName.Length > maxValue)
             {
-                ui.ConsoleMessageWrite("It's not a valid model name, it should have 3 letters or moore but not bigger than 20" +
+                ui.ConsoleMessageWrite($"It's not a valid {prompt} name, it should have {minValue} letters or moore but not bigger than {maxValue}" +
                                        "\nTry Again: ");
             }
+            else
+            {
+                isValid = true;
+            }
 
-        } while (!IsValidModelName(modelName));
+        } while (!isValid);
 
         return modelName;
     }
@@ -115,37 +119,6 @@ public static class Validation
 
         return registrationNumber;
     }
-    public static string CheckColorInput(IUi ui)
-    {
-        string color;
-        do
-        {
-            color = ui.UserInput();
-            if (!IsValidColor(color))
-            {
-                ui.ConsoleMessageWrite("It's not a valid color, it needs to be bigger than 2 letters but not longer than 25." +
-                                       "\nTry again: ");
-            }
-
-        } while (!IsValidColor(color));
-
-        return color;
-    }
-    public static int CheckNumberOfWheelsInput(IUi ui)
-    {
-        int numberOfWheels;
-        do
-        {
-            numberOfWheels = CheckValidNumber(ui);
-            if (!IsValidNumberOfWheels(numberOfWheels))
-            {
-                ui.ConsoleMessageWrite("You have entered an invalid number of wheels, it can't be bigger than 20" +
-                                       "\nTry again: ");
-            }
-        } while (!IsValidNumberOfWheels(numberOfWheels));
-
-        return numberOfWheels;
-    }
     public static int CheckProductionYearInput(IUi ui)
     {
         int productionYear;
@@ -161,12 +134,6 @@ public static class Validation
 
         return productionYear;
     }
-    public static bool IsValidModelName(string model)
-    {
-        bool isValidName = model.Length >= 3 && model.Length < 20;
-
-        return isValidName;
-    }
     public static bool IsValidRegistrationNumber(string value)
     {
 
@@ -178,16 +145,6 @@ public static class Validation
             .All(char.IsDigit);
 
         return isFirstThreeCharsLetters && isLastThreeCharsNumber;
-    }
-    public static bool IsValidColor(string color)
-    {
-        bool isValidColor = color.Length >= 2 && color.Length < 25;
-        return isValidColor;
-    }
-    public static bool IsValidNumberOfWheels(int numberOfWheels)
-    {
-        bool isValidWheels = numberOfWheels < 20;
-        return isValidWheels;
     }
     public static bool IsValidProductionYear(int productionYear)
     {

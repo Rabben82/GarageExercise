@@ -6,4 +6,10 @@ public static class GarageHelpers
     public const int MaxGarageSize = 15;
     public const int MinMenuValue = 1;
     public const int MaxMenuValue = 5;
+    public const int minWheels = 2;
+    public const int maxWheels = 20;
+    public const int minModelNameLetters = 3;
+    public const int maxModelNameLetters = 20;
+    public const int minColorLetters = 2;
+    public const int maxColorLetters = 25;
 }

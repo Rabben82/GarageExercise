@@ -39,7 +39,7 @@ public class GarageHandler
                 garage.Park(emptyVehicle); // Add an empty vehicle to the empty slot showing the user its available to park
         }
     }
-    public IEnumerable<string> ShowVehicleTypeAmount()
+    public IEnumerable<string> DisplayVehicleByTypeAndAmount()
     {
         var vehicleAmount = garage
             .GroupBy(vehicle => vehicle.GetType().Name)
@@ -56,14 +56,14 @@ public class GarageHandler
             yield return $"{count.TypeName}: {count.Count}";
         }
     }
-    public IEnumerable<string> DisplayParkedVehicles()
+    public IEnumerable<string> DisplayParkedVehiclesFullInfo()
     {
         return from item in garage where item.Model != "Available" select $"{item}";
     }
     public void RemoveVehicle()
     {
         DisplayParkedVehiclesWithIndex();
-        int selectedSlot = Validation.CheckUserSelection(ui,"\nChoose the parking slot number of the vehicle you want to remove:\n\nYour Choice: ");
+        int selectedSlot = Validation.CheckValidNumber(ui,"\nChoose the parking slot number of the vehicle you want to remove:\n\nYour Choice: ");
         RemoveVehicleFromGarage(selectedSlot);
     }
     private void DisplayParkedVehiclesWithIndex()
@@ -104,8 +104,8 @@ public class GarageHandler
     public void AddVehicleByUserInput(Vehicle vehicle)
     {
         DisplayParkedVehiclesWithIndex();
-        var validNumber = Validation.CheckUserSelection(ui, "\nChoose an available parking slot number for the vehicle!\nYour Choice: ");
-        var isFreeParkingSpot = garage.ElementAtOrDefault(validNumber)?.GetType().Name == "AvailableParkingSlot";
+        var validNumber = Validation.CheckValidNumber(ui, "\nChoose an available parking slot number for the vehicle!\nYour Choice: ");
+        var isFreeParkingSpot = garage.ElementAtOrDefault(validNumber -1)?.GetType().Name == "AvailableParkingSlot";
 
         if (IsValueInRange(validNumber) && isFreeParkingSpot)
         {

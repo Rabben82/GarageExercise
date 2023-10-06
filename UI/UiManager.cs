@@ -1,19 +1,20 @@
-﻿using GarageExercise.Entities;
-using GarageExercise.Garage;
+﻿using GarageExercise.Garage;
 using GarageExercise.Validations;
 
 namespace GarageExercise.UI
 {
     internal class UiManager
     {
-        private readonly GarageHandler garageHandler;
-        private readonly IUi ui;
+        public readonly GarageHandler garageHandler;
+        public readonly IUi ui;
         private bool isRunning;
+        private readonly ConstructVehicle constructVehicle;
 
         public UiManager(GarageHandler handler, IUi ui)
         {
             garageHandler = handler;
             this.ui = ui;
+            constructVehicle = new ConstructVehicle(this);
         }
         public void Run()
         {
@@ -62,10 +63,10 @@ namespace GarageExercise.UI
             switch (validNumber)
             {
                 case 1:
-                    PrintResultToConsole("Number Of Parked Vehicles Based On Type!\n", garageHandler.ShowVehicleTypeAmount());
+                    PrintResultToConsole("Number Of Parked Vehicles Based On Type!\n", garageHandler.DisplayVehicleByTypeAndAmount());
                     break;
                 case 2:
-                    PrintResultToConsole("Parked Cars Full Specification!\n", garageHandler.DisplayParkedVehicles());
+                    PrintResultToConsole("Parked Cars Full Specification!\n", garageHandler.DisplayParkedVehiclesFullInfo());
                     break;
                 case 3:
                     ui.ClearConsole();
@@ -112,66 +113,7 @@ namespace GarageExercise.UI
 
             var validNr = Validation.CheckValidNumber(ui,GarageHelpers.MinMenuValue, GarageHelpers.MaxMenuValue); ;
 
-            AddVehicleProperties(validNr);
-        }
-        public void AddVehicleProperties(int validNr)
-        {
-            ui.ConsoleMessageWrite("Enter Vehicle Model: ");
-            var model = Validation.CheckModelNameInput(ui);
-            ui.ConsoleMessageWrite("Enter Vehicle Registration Number: ");
-            var registrationNumber = Validation.CheckRegistrationNumberInput(ui);
-            ui.ConsoleMessageWrite("Enter Color Of Vehicle: ");
-            var color = Validation.CheckColorInput(ui);
-            ui.ConsoleMessageWrite("Enter How Many Wheels The Vehicle Has: ");
-            var numberOfWheels = Validation.CheckNumberOfWheelsInput(ui);
-            ui.ConsoleMessageWrite("Enter The Production Year Of The Vehicle: ");
-            var productionYear = Validation.CheckProductionYearInput(ui);
-
-            AddVehiclePropertiesMenu(validNr, model, registrationNumber, color, numberOfWheels, productionYear);
-        }
-
-        public void AddVehiclePropertiesMenu(int userSelection, string model, string registrationNumber, string color, int numberOfWheels, int productionYear)
-        {
-            switch (userSelection)
-            {
-                case 1:
-                    ui.ConsoleMessageWrite("Enter Fuel Type: ");
-                    var carFuelType = Validation.CheckCarFuelTypeInput(ui);
-                    ui.ClearConsole();
-                    garageHandler.AddVehicleByUserInput(new Car(model, registrationNumber, color, numberOfWheels, productionYear, carFuelType));
-                    ui.WaitForKeyPress();
-                    break;
-                case 2:
-                    ui.ConsoleMessageWrite("Enter Number Of Seats: ");
-                    var numberOfSeats = Validation.CheckValidNumber(ui);
-                    ui.ClearConsole();
-                    garageHandler.AddVehicleByUserInput(new Bus(model, registrationNumber, color, numberOfWheels, productionYear, numberOfSeats));
-                    ui.WaitForKeyPress();
-                    break;
-                case 3:
-                    ui.ConsoleMessageWrite("Enter Horse Power: ");
-                    var horsePower = ui.UserInput();
-                    ui.ClearConsole();
-                    garageHandler.AddVehicleByUserInput(new Motorcycle(model, registrationNumber, color, numberOfWheels, productionYear, horsePower));
-                    ui.WaitForKeyPress();
-                    break;
-                case 4:
-                    ui.ConsoleMessageWrite("Enter Length: ");
-                    var length = Validation.CheckValidNumber(ui);
-                    ui.ClearConsole();
-                    garageHandler.AddVehicleByUserInput(new Boat(model, registrationNumber, color, numberOfWheels, productionYear, length));
-                    ui.WaitForKeyPress();
-                    break;
-                case 5:
-                    ui.ConsoleMessageWrite("Enter Number Of Engines: ");
-                    var airPlaneLength = Validation.CheckValidNumber(ui);
-                    ui.ClearConsole();
-                    garageHandler.AddVehicleByUserInput(new AirPlane(model, registrationNumber, color, numberOfWheels, productionYear, airPlaneLength));
-                    ui.WaitForKeyPress();
-                    break;
-                default:
-                    throw new IndexOutOfRangeException("You Have Chosen A Value That Doesn't Exist.");
-            }
+            constructVehicle.AddVehicleProperties(validNr);
         }
 
         public void PrintResultToConsole(string prompt, IEnumerable<string> result)

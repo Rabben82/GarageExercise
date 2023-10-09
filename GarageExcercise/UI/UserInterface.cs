@@ -11,6 +11,6 @@ public class UserInterface : IUi
     public void ConsoleMessageWriteLine(Vehicle vehicle) => Console.WriteLine(vehicle);
     public void ClearConsole() => Console.Clear();
     public void WaitForKeyPress() => Console.ReadKey();
-    public string UserInput() => (Console.ReadLine() ?? throw new NullReferenceException("Can't Be Null Or Whitespace")).Trim();
+    public string UserInput() => (Console.ReadLine() ?? throw new NullReferenceException("Error: Value is null!"));
     
 }

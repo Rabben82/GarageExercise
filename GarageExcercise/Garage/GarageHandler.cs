@@ -10,26 +10,32 @@ public class GarageHandler : IGarageHandler
     private readonly IUi ui;
     public GarageHandler(IUi ui)
     {
-        var list = new List<Vehicle>();
+        //var list = new List<Vehicle>();
         this.ui = ui;
     }
     public void Initialize(int sizeOfGarage)
     {
         garage = new Garage<Vehicle>(sizeOfGarage);
         //this initializes some default cars into the garage
+        InitializeDefaultVehicles();
+        //This initializes the rest of the array with vehicle objects displaying its available to park there
+        var availableParkingSlot = AvailableParkingSlot.CreateAvailableParkingSlot();
+        AddAvailableParkingSlots(availableParkingSlot);
+    }
+
+    private void InitializeDefaultVehicles()
+    {
         var bus = Bus.CreateDefaultBus();
         var airPlane = AirPlane.CreateDefaultAirplane();
         var car = Car.CreateDefaultCar();
         var motorcycle = Motorcycle.CreateDefaultMotorcycle();
-        var availableParkingSlot = AvailableParkingSlot.CreateAvailableParkingSlot();
 
         garage.Park(bus);
         garage.Park(airPlane);
         garage.Park(car);
         garage.Park(motorcycle);
-        //This initializes the rest of the array with vehicle objects displaying its available to park there
-        AddAvailableParkingSlots(availableParkingSlot);
     }
+
     public void AddAvailableParkingSlots(Vehicle emptyVehicle)
     {
         foreach (var items in garage)
@@ -65,7 +71,6 @@ public class GarageHandler : IGarageHandler
         int selectedSlot = Validation.CheckValidNumber(ui, "\nChoose the parking slot number of the vehicle you want to remove:\n\nYour Choice: ");
         RemoveVehicleFromGarage(selectedSlot);
     }
-
     public void DisplayParkedVehiclesWithIndex()
     {
         int vehicleIndex = 0;
@@ -76,7 +81,6 @@ public class GarageHandler : IGarageHandler
             ui.ConsoleMessageWriteLine($"{vehicleIndex}. {vehicle}");
         }
     }
-
     public void RemoveVehicleFromGarage(int selectedSlot)
     {
         int slotIndex = selectedSlot - 1; // Convert to 0-based index
@@ -121,7 +125,8 @@ public class GarageHandler : IGarageHandler
     public void SearchByRegistrationNumber(string registrationNumber)
     {
         var matchingRegistrationNumber = garage
-            .Where(vehicle => vehicle.RegistrationNumber.ToLower().Replace(" ", "") == registrationNumber.ToLower().Replace(" ", ""));
+            .Where(vehicle => vehicle != null &&
+                              vehicle.RegistrationNumber.ToLower().Replace(" ", "") == registrationNumber.ToLower().Replace(" ", ""));
 
         if (matchingRegistrationNumber.Any())
         {
@@ -136,7 +141,6 @@ public class GarageHandler : IGarageHandler
         {
             ui.ConsoleMessageWriteLine($"The Registration Number ({registrationNumber}) Isn't Found In The Garage.");
         }
-
     }
     public void SearchByProperties(string[] properties)
     {
@@ -163,7 +167,6 @@ public class GarageHandler : IGarageHandler
             ui.ConsoleMessageWriteLine("No match found!");
         }
     }
-
     public List<Vehicle> GetMatchingVehicles(string[] properties)
     {
         List<Vehicle> matchingVehicles = new List<Vehicle>();
@@ -181,11 +184,9 @@ public class GarageHandler : IGarageHandler
                     (vehicle.NumberOfWheels == parsedValue || vehicle.ProductionYear == parsedValue) ||
                     string.IsNullOrEmpty(property) && vehicle.ProductionYear == 0))
             {
-                // If any property matches, add the vehicle to the list of matching vehicles
                 matchingVehicles.Add(vehicle);
             }
         }
-
         return matchingVehicles;
     }
 }

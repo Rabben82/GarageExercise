@@ -16,6 +16,6 @@ public class Car : Vehicle
     }
     public static Car CreateDefaultCar()
     {
-        return new Car("Volkswagen", "YRT 217", "red", 4, 1998, "Diesel");
+        return new Car("Volkswagen", "ABC 123", "red", 4, 1998, "Diesel");
     }
 }

@@ -1,4 +1,5 @@
-﻿using GarageExercise.Entities;
+﻿using System.Runtime.InteropServices.JavaScript;
+using GarageExercise.Entities;
 using GarageExercise.Enums;
 using GarageExercise.Garage;
 using GarageExercise.UI;
@@ -129,20 +130,20 @@ public static class Validation
             productionYear = CheckValidNumber(ui);
             if (!IsValidProductionYear(productionYear))
             {
-                ui.ConsoleMessageWrite("It's not an valid production year, it should look like this (1990)" +
+                ui.ConsoleMessageWrite($"It's not an valid production year, it should look like this (1990) and not be earlier than 1940 and later than {DateTime.Today.Year}!" +
                                        "\nTry again: ");
             }
         } while (!IsValidProductionYear(productionYear));
 
         return productionYear;
     }
-    public static bool IsValidRegistrationNumber(string value)
+    public static bool IsValidRegistrationNumber(string registrationNumber)
     {
 
-        bool isFirstThreeCharsLetters = value
+        bool isFirstThreeCharsLetters = registrationNumber
             .Take(3)
             .All(char.IsLetter);
-        bool isLastThreeCharsNumber = value
+        bool isLastThreeCharsNumber = registrationNumber
             .TakeLast(3)
             .All(char.IsDigit);
 
@@ -150,7 +151,9 @@ public static class Validation
     }
     public static bool IsValidProductionYear(int productionYear)
     {
-        bool isValidProductionYear = productionYear.ToString().Length == 4;
+        
+
+        bool isValidProductionYear = productionYear.ToString().Length == 4 && productionYear >= GarageHelpers.minProductionYear && productionYear <= GarageHelpers.maxProductionYear;
         return isValidProductionYear;
     }
     public static string CheckCarFuelTypeInput(IUi ui)

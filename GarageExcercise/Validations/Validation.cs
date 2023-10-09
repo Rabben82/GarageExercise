@@ -73,7 +73,7 @@ public static class Validation
             {
                 ui.ConsoleMessageWrite($"Error: Input cannot be blank.\nTry again: ");
             }
-            else if (int.TryParse(userInput, out number) && number > minValue && number < maxValue)
+            else if (int.TryParse(userInput, out number) && number >= minValue && number <= maxValue)
             {
                 isValid = true;
             }

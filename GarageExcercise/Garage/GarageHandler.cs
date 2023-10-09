@@ -8,7 +8,6 @@ public class GarageHandler : IGarageHandler
 {
     private Garage<Vehicle> garage = default!;
     private readonly IUi ui;
-
     public GarageHandler(IUi ui)
     {
         var list = new List<Vehicle>();
@@ -63,7 +62,7 @@ public class GarageHandler : IGarageHandler
     public void RemoveVehicle()
     {
         DisplayParkedVehiclesWithIndex();
-        int selectedSlot = Validation.CheckValidNumber(ui,"\nChoose the parking slot number of the vehicle you want to remove:\n\nYour Choice: ");
+        int selectedSlot = Validation.CheckValidNumber(ui, "\nChoose the parking slot number of the vehicle you want to remove:\n\nYour Choice: ");
         RemoveVehicleFromGarage(selectedSlot);
     }
 
@@ -107,7 +106,7 @@ public class GarageHandler : IGarageHandler
     {
         DisplayParkedVehiclesWithIndex();
         var validNumber = Validation.CheckValidNumber(ui, "\nChoose an available parking slot number for the vehicle!\nYour Choice: ");
-        var isFreeParkingSpot = garage.ElementAtOrDefault(validNumber -1)?.GetType().Name == "AvailableParkingSlot";
+        var isFreeParkingSpot = garage.ElementAtOrDefault(validNumber - 1)?.GetType().Name == "AvailableParkingSlot";
 
         if (Validation.IsValueInRange(validNumber, garage) && isFreeParkingSpot)
         {
@@ -122,7 +121,7 @@ public class GarageHandler : IGarageHandler
     public void SearchByRegistrationNumber(string registrationNumber)
     {
         var matchingRegistrationNumber = garage
-            .Where(vehicle => vehicle?.RegistrationNumber?.ToLower().Replace(" ", "") == registrationNumber.ToLower().Replace(" ", ""));
+            .Where(vehicle => vehicle.RegistrationNumber.ToLower().Replace(" ", "") == registrationNumber.ToLower().Replace(" ", ""));
 
         if (matchingRegistrationNumber.Any())
         {
@@ -146,11 +145,17 @@ public class GarageHandler : IGarageHandler
         // Display the matching vehicles
         if (matchingVehicles.Count > 0)
         {
+            ui.ConsoleMessageWriteLine($"You're search matches these properties in these vehicles!");
             foreach (var matchedVehicle in matchingVehicles)
             {
-                ui.ConsoleMessageWriteLine(matchedVehicle.GetType().Name == "AvailableParkingSlot"
-                    ? $"You entered an empty value, and that matches!\n{matchedVehicle}"
-                    : $"These properties matches your search!\n{matchedVehicle}");
+                if (matchedVehicle.GetType().Name == "AvailableParkingSlot")
+                {
+                    ui.ConsoleMessageWriteLine($"You've entered an empty value, and that matches: {matchedVehicle}");
+                }
+                else
+                {
+                    ui.ConsoleMessageWriteLine(matchedVehicle);
+                }
             }
         }
         else

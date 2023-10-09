@@ -111,7 +111,7 @@ namespace GarageExercise.UI
                                          "\n5. Airplane" +
                                          "\n\nEnter Your Choice: ");
 
-            var validNr = Validation.CheckValidNumber(ui,GarageHelpers.MinMenuValue, GarageHelpers.MaxMenuValue); ;
+            var validNr = Validation.CheckValidNumber(ui, GarageHelpers.MinMenuValue, GarageHelpers.MaxMenuValue); ;
 
             constructVehicle.AddVehicleProperties(validNr);
         }

@@ -14,7 +14,7 @@ namespace GarageExercise.Tests
             var uiMock = new Mock<IUi>();
             var vehicleMock = Bus.CreateDefaultBus();
             var garageHandler = new GarageHandler(uiMock.Object);
-            garageHandler.Initialize(5); // Initialize with a garage size of 4
+            garageHandler.Initialize(5); // Initialize with a garage size of 5
 
             // Act
             garageHandler.RemoveVehicleFromGarage(1); // Remove the first vehicle
@@ -36,6 +36,44 @@ namespace GarageExercise.Tests
 
             // Assert
             uiMock.Verify(ui => ui.ConsoleMessageWrite("You can't remove an available parking slot!\nPress any key to continue."), Times.Once);
+        }
+
+        [Fact]
+        public void SearchByRegistrationNumber_FoundInGarage()
+        {
+            // Arrange
+            var uiMock = new Mock<IUi>();
+            var garageHandler = new GarageHandler(uiMock.Object);
+            garageHandler.Initialize(5); // Initialize with a garage size of 5
+
+            // Add vehicles with known registration numbers
+            var vehicle1 = Bus.CreateDefaultBus();
+            var vehicle2 = Car.CreateDefaultCar();
+            var vehicle3 = Motorcycle.CreateDefaultMotorcycle();
+
+            string expectedRegistrationNr = vehicle1.RegistrationNumber;
+            string failReg = "abd123";
+
+            // Act
+            garageHandler.SearchByRegistrationNumber(expectedRegistrationNr);
+
+            // Assert
+            uiMock.Verify(ui => ui.ConsoleMessageWriteLine("Registration Number Found In The Garage!"), Times.Once);
+        }
+
+        [Fact]
+        public void SearchByRegistrationNumber_NotFoundInGarage()
+        {
+            // Arrange
+            var uiMock = new Mock<IUi>();
+            var garageHandler = new GarageHandler(uiMock.Object);
+            garageHandler.Initialize(5); // Initialize with a garage size of 5
+
+            // Act
+            garageHandler.SearchByRegistrationNumber("xbc172");
+
+            // Assert
+            uiMock.Verify(ui => ui.ConsoleMessageWriteLine("The Registration Number (xbc172) Isn't Found In The Garage."), Times.Once);
         }
     }
 }

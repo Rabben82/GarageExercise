@@ -20,6 +20,10 @@ namespace GarageExercise.Tests
             garageHandler.RemoveVehicleFromGarage(1); // Remove the first vehicle
 
             // Assert
+            // You can add assertions here to check if the vehicle was removed successfully.
+            // For example, you can check if the garage is now empty at slot 0:
+            //var vehicles = garageHandler.DisplayParkedVehiclesFullInfo();
+            //Assert.DoesNotContain("Available", vehicles); // Check if the first slot is not "Available"
             uiMock.Verify(ui => ui.ConsoleMessageWriteLine($"You Have Removed: {vehicleMock}"));
         }
 
@@ -35,6 +39,9 @@ namespace GarageExercise.Tests
             garageHandler.RemoveVehicleFromGarage(5); // Try to remove from an AvailableParkingSpace slot
 
             // Assert
+            // You can add assertions here to check if the method behaves as expected.
+            // For example, you can check if the appropriate error message is displayed.
+            // You might need to adjust the code according to how your UI or error handling works.
             uiMock.Verify(ui => ui.ConsoleMessageWrite("You can't remove an available parking slot!\nPress any key to continue."), Times.Once);
         }
 
@@ -58,6 +65,7 @@ namespace GarageExercise.Tests
             garageHandler.SearchByRegistrationNumber(expectedRegistrationNr);
 
             // Assert
+            // Verify that the appropriate methods on the IUi mock were called
             uiMock.Verify(ui => ui.ConsoleMessageWriteLine("Registration Number Found In The Garage!"), Times.Once);
         }
 
@@ -73,6 +81,7 @@ namespace GarageExercise.Tests
             garageHandler.SearchByRegistrationNumber("xbc172");
 
             // Assert
+            // Verify that the appropriate method on the IUi mock was called
             uiMock.Verify(ui => ui.ConsoleMessageWriteLine("The Registration Number (xbc172) Isn't Found In The Garage."), Times.Once);
         }
     }

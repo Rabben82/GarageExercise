@@ -1,4 +1,5 @@
 ﻿using GarageExercise.Entities;
+using GarageExercise.Enums;
 using GarageExercise.UI;
 using GarageExercise.Validations;
 
@@ -7,10 +8,12 @@ namespace GarageExercise.Garage;
 internal class ConstructVehicle
 {
     private readonly UiManager uiManager;
+    private readonly GarageHandler garageHandler;
     private int numberOfWheels;
-    public ConstructVehicle(UiManager uiManager)
+    public ConstructVehicle(UiManager uiManager, GarageHandler garageHandler)
     {
         this.uiManager = uiManager;
+        this.garageHandler = garageHandler;
     }
     public void AddVehicleProperties(int validNr)
     {
@@ -18,10 +21,11 @@ internal class ConstructVehicle
         uiManager.ui.ConsoleMessageWrite("Enter Vehicle Model: ");
         var model = Validation.CheckValidStringLengthInput(uiManager.ui, GarageHelpers.minModelNameLetters, GarageHelpers.maxModelNameLetters, "model");
         uiManager.ui.ConsoleMessageWrite("Enter Vehicle Registration Number: ");
-        var registrationNumber = Validation.CheckRegistrationNumberInput(uiManager.ui);
+        var registrationNumber =Validation.CheckValidRegistrationNumber(uiManager, uiManager.ui, garageHandler);
+
         uiManager.ui.ConsoleMessageWrite("Enter Color Of Vehicle: ");
         var color = Validation.CheckValidStringLengthInput(uiManager.ui, GarageHelpers.minColorLetters, GarageHelpers.maxColorLetters, "color");
-        if (validNr >= GarageHelpers.vehiclesWithWheelsInMenuRangeStart && validNr <= GarageHelpers.vehiclesWithWheelsInMenuRangeEnd)
+        if (validNr >= GarageHelpers.vehiclesWithWheelsIndexStart && validNr <= GarageHelpers.vehiclesWithWheelsIndexEnd)//if vehicles without wheels it skips and the user don't need to enter wheels property
         {
             uiManager.ui.ConsoleMessageWrite("Enter How Many Wheels The Vehicle Has: ");
             numberOfWheels = Validation.CheckValidNumber(uiManager.ui, GarageHelpers.minWheels, GarageHelpers.maxWheels, "You have entered an invalid number of wheels");
@@ -35,21 +39,21 @@ internal class ConstructVehicle
     {
         switch (userSelection)
         {
-            case 1:
+            case (int)VehicleTypes.Car:
                 uiManager.ui.ConsoleMessageWrite("Enter Fuel Type: ");
                 var carFuelType = Validation.CheckCarFuelTypeInput(uiManager.ui);
                 uiManager.ui.ClearConsole();
                 uiManager.garageHandler.AddVehicleByUserInput(new Car(model, registrationNumber, color, numberOfWheels, productionYear, carFuelType));
                 uiManager.ui.WaitForKeyPress();
                 break;
-            case 2:
+            case (int)VehicleTypes.Bus:
                 uiManager.ui.ConsoleMessageWrite("Enter Number Of Seats: ");
                 var numberOfSeats = Validation.CheckValidNumber(uiManager.ui, GarageHelpers.minNrOfSeats, GarageHelpers.maxNrOfSeats);
                 uiManager.ui.ClearConsole();
                 uiManager.garageHandler.AddVehicleByUserInput(new Bus(model, registrationNumber, color, numberOfWheels, productionYear, numberOfSeats));
                 uiManager.ui.WaitForKeyPress();
                 break;
-            case 3:
+            case (int)VehicleTypes.Motorcycle:
                 uiManager.ui.ConsoleMessageWrite("Enter Horse Power: ");
                 var horsePower = Validation.CheckValidStringLengthInput(uiManager.ui, GarageHelpers.minHoursePowerLength, GarageHelpers.maxHoursePowerLength,
                     "length for horse power");
@@ -57,14 +61,14 @@ internal class ConstructVehicle
                 uiManager.garageHandler.AddVehicleByUserInput(new Motorcycle(model, registrationNumber, color, numberOfWheels, productionYear, horsePower));
                 uiManager.ui.WaitForKeyPress();
                 break;
-            case 4:
+            case (int)VehicleTypes.Boat:
                 uiManager.ui.ConsoleMessageWrite("Enter Length: ");
                 var length = Validation.CheckValidNumber(uiManager.ui, GarageHelpers.minLength,GarageHelpers.maxLength, "You don't need to specify the length with decimal, it accepts whole numbers!");
                 uiManager.ui.ClearConsole();
                 uiManager.garageHandler.AddVehicleByUserInput(new Boat(model, registrationNumber, color, numberOfWheels = 0, productionYear, length));
                 uiManager.ui.WaitForKeyPress();
                 break;
-            case 5:
+            case (int)VehicleTypes.Airplane:
                 uiManager.ui.ConsoleMessageWrite("Enter Number Of Engines: ");
                 var airPlaneLength = Validation.CheckValidNumber(uiManager.ui,GarageHelpers.minNrOfEngines,GarageHelpers.maxNrOfEngines);
                 uiManager.ui.ClearConsole();
@@ -75,4 +79,5 @@ internal class ConstructVehicle
                 throw new IndexOutOfRangeException("You Have Chosen A Value That Doesn't Exist.");
         }
     }
+    
 }

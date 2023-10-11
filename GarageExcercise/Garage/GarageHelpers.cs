@@ -22,7 +22,7 @@ public static class GarageHelpers
     public const int minHoursePowerLength = 2;
     public const int maxHoursePowerLength = 5;
 
-    public const int vehiclesWithWheelsInMenuRangeStart = 1;
-    public const int vehiclesWithWheelsInMenuRangeEnd = 3;
+    public const int vehiclesWithWheelsIndexStart = 1;
+    public const int vehiclesWithWheelsIndexEnd = 3;
     public static readonly int maxProductionYear = DateTime.Now.Year;
 }

@@ -8,11 +8,13 @@ public class GarageHandler : IGarageHandler
 {
     private Garage<Vehicle> garage = default!;
     private readonly IUi ui;
+
     public GarageHandler(IUi ui)
     {
         //var list = new List<Vehicle>();
         this.ui = ui;
     }
+
     public void Initialize(int sizeOfGarage)
     {
         garage = new Garage<Vehicle>(sizeOfGarage);
@@ -41,9 +43,11 @@ public class GarageHandler : IGarageHandler
         foreach (var items in garage)
         {
             if (items == null)
-                garage.Park(emptyVehicle); // Add an empty vehicle to the empty slot showing the user its available to park
+                garage.Park(
+                    emptyVehicle); // Add an empty vehicle to the empty slot showing the user its available to park
         }
     }
+
     public IEnumerable<string> DisplayVehicleByTypeAndAmount()
     {
         var vehicleAmount = garage
@@ -61,16 +65,20 @@ public class GarageHandler : IGarageHandler
             yield return $"{count.TypeName}: {count.Count}";
         }
     }
+
     public IEnumerable<string> DisplayParkedVehiclesFullInfo()
     {
         return from item in garage where item.Model != "Available" select $"{item}";
     }
+
     public void RemoveVehicle()
     {
         DisplayParkedVehiclesWithIndex();
-        int selectedSlot = Validation.CheckValidNumber(ui, "\nChoose the parking slot number of the vehicle you want to remove:\n\nYour Choice: ");
+        int selectedSlot = Validation.CheckValidNumber(ui,
+            "\nChoose the parking slot number of the vehicle you want to remove:\n\nYour Choice: ");
         RemoveVehicleFromGarage(selectedSlot);
     }
+
     public void DisplayParkedVehiclesWithIndex()
     {
         int vehicleIndex = 0;
@@ -81,6 +89,7 @@ public class GarageHandler : IGarageHandler
             ui.ConsoleMessageWriteLine($"{vehicleIndex}. {vehicle}");
         }
     }
+
     public void RemoveVehicleFromGarage(int selectedSlot)
     {
         int slotIndex = selectedSlot - 1; // Convert to 0-based index
@@ -96,6 +105,7 @@ public class GarageHandler : IGarageHandler
                 ui.ConsoleMessageWrite("You can't remove an available parking slot!\nPress any key to continue.");
                 return;
             }
+
             //replace the removed vehicle with available parking slot
             garage.Remove(availableParkingSlot, slotIndex);
 
@@ -103,30 +113,37 @@ public class GarageHandler : IGarageHandler
         }
         else
         {
-            ui.ConsoleMessageWriteLine("Invalid parking slot number. No vehicle was removed.\nPress any key to continue!");
+            ui.ConsoleMessageWriteLine(
+                "Invalid parking slot number. No vehicle was removed.\nPress any key to continue!");
         }
     }
+
     public void AddVehicleByUserInput(Vehicle vehicle)
     {
         DisplayParkedVehiclesWithIndex();
-        var validNumber = Validation.CheckValidNumber(ui, "\nChoose an available parking slot number for the vehicle!\nYour Choice: ");
+        var validNumber = Validation.CheckValidNumber(ui,
+            "\nChoose an available parking slot number for the vehicle!\nYour Choice: ");
         var isFreeParkingSpot = garage.ElementAtOrDefault(validNumber - 1)?.GetType().Name == "AvailableParkingSlot";
 
         if (Validation.IsValueInRange(validNumber, garage) && isFreeParkingSpot)
         {
-            garage.Park(vehicle, validNumber - 1);// Convert to 0-based index
-            ui.ConsoleMessageWriteLine($"\nYou Have Added:\n{vehicle}\nTo Parking-Slot: {validNumber}\nPress any key to continue.");
+            garage.Park(vehicle, validNumber - 1); // Convert to 0-based index
+            ui.ConsoleMessageWriteLine(
+                $"\nYou Have Added:\n{vehicle}\nTo Parking-Slot: {validNumber}\nPress any key to continue.");
         }
         else
         {
-            ui.ConsoleMessageWriteLine("Invalid parking slot number or not a free parking slot. The vehicle was not parked.");
+            ui.ConsoleMessageWriteLine(
+                "Invalid parking slot number or not a free parking slot. The vehicle was not parked.");
         }
     }
+
     public void SearchByRegistrationNumber(string registrationNumber)
     {
         var matchingRegistrationNumber = garage
             .Where(vehicle => vehicle != null &&
-                              vehicle.RegistrationNumber.ToLower().Replace(" ", "") == registrationNumber.ToLower().Replace(" ", ""));
+                              vehicle.RegistrationNumber.ToLower().Replace(" ", "") ==
+                              registrationNumber.ToLower().Replace(" ", ""));
 
         if (matchingRegistrationNumber.Any())
         {
@@ -142,6 +159,7 @@ public class GarageHandler : IGarageHandler
             ui.ConsoleMessageWriteLine($"The Registration Number ({registrationNumber}) Isn't Found In The Garage.");
         }
     }
+
     public void SearchByProperties(string[] properties)
     {
         var matchingVehicles = GetMatchingVehicles(properties);
@@ -149,7 +167,7 @@ public class GarageHandler : IGarageHandler
         // Display the matching vehicles
         if (matchingVehicles.Count > 0)
         {
-            ui.ConsoleMessageWriteLine($"You're search matches these properties in these vehicles!");
+            ui.ConsoleMessageWriteLine($"One or more property matches this/these vehicles!");
             foreach (var matchedVehicle in matchingVehicles)
             {
                 if (matchedVehicle.GetType().Name == "AvailableParkingSlot")
@@ -167,6 +185,7 @@ public class GarageHandler : IGarageHandler
             ui.ConsoleMessageWriteLine("No match found!");
         }
     }
+
     public List<Vehicle> GetMatchingVehicles(string[] properties)
     {
         List<Vehicle> matchingVehicles = new List<Vehicle>();
@@ -187,6 +206,18 @@ public class GarageHandler : IGarageHandler
                 matchingVehicles.Add(vehicle);
             }
         }
+
         return matchingVehicles;
+    }
+
+    public bool IsRegNumberExisting(string regNumber)
+    {
+        return garage.Any(
+            item => string.Equals(
+                item.RegistrationNumber.Replace(" ", "").Trim(),
+                regNumber.Replace(" ", "").Trim(),
+                StringComparison.OrdinalIgnoreCase
+            )
+        ); ;
     }
 }

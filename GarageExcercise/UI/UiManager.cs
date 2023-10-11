@@ -3,18 +3,18 @@ using GarageExercise.Validations;
 
 namespace GarageExercise.UI
 {
-    internal class UiManager
+    public class UiManager
     {
         public readonly GarageHandler garageHandler;
         public readonly IUi ui;
-        private bool isRunning;
         private readonly ConstructVehicle constructVehicle;
-
+        private bool isRunning;
+        
         public UiManager(GarageHandler handler, IUi ui)
         {
             garageHandler = handler;
             this.ui = ui;
-            constructVehicle = new ConstructVehicle(this);
+            constructVehicle = new ConstructVehicle(this, garageHandler);
         }
         public void Run()
         {
@@ -93,6 +93,7 @@ namespace GarageExercise.UI
                 case 7:
                     isRunning = false;
                     ui.ConsoleMessageWriteLine("Goodbye And Welcome Back!");
+                    Environment.Exit(0);
                     break;
                 default:
                     ui.ConsoleMessageWriteLine("The Value You Have Entered Is Not Represented In The Menu" +
@@ -127,6 +128,7 @@ namespace GarageExercise.UI
             }
 
             ui.WaitForKeyPress();
+
         }
     }
 }

@@ -137,6 +137,21 @@ public static class Validation
 
         return productionYear;
     }
+    public static string CheckValidRegistrationNumber(UiManager manager, IUi ui, GarageHandler garageHandler)
+    {
+        var registrationNumber = Validation.CheckRegistrationNumberInput(ui);
+        bool isRegDuplicate = garageHandler.IsRegNumberExisting(registrationNumber);
+
+        if (isRegDuplicate)
+        {
+            ui.ConsoleMessageWriteLine($"Vehicle with regnr: {registrationNumber} already exists." +
+                                                 $"\nCan't add new vehicle, press any key to return to menu!");
+            ui.WaitForKeyPress();
+            manager.Menu();
+        }
+
+        return registrationNumber;
+    }
     public static bool IsValidRegistrationNumber(string registrationNumber)
     {
 

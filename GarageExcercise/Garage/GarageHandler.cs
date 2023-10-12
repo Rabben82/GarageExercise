@@ -50,22 +50,14 @@ public class GarageHandler : IGarageHandler
 
     public IEnumerable<string> DisplayVehicleByTypeAndAmount()
     {
-        var vehicleAmount = garage
+        return garage
             .GroupBy(vehicle => vehicle.GetType().Name)
-            .Select(group => new
-            {
-                TypeName = group.Key,
-                Count = group.Count()
-            })
+            .Select(group => $"{group.Key}: {group.Count()}")
             .ToList();
-
-        foreach (var count in vehicleAmount)
-        {
-            //if (count.TypeName != "AvailableParkingSlot")
-            yield return $"{count.TypeName}: {count.Count}";
-        }
     }
 
+
+   
     public IEnumerable<string> DisplayParkedVehiclesFullInfo()
     {
         return from item in garage where item.Model != "Available" select $"{item}";
@@ -140,24 +132,19 @@ public class GarageHandler : IGarageHandler
 
     public void SearchByRegistrationNumber(string registrationNumber)
     {
-        var matchingRegistrationNumber = garage
-            .Where(vehicle => vehicle != null &&
+        var vehicle = garage
+            .FirstOrDefault(vehicle => vehicle != null &&
                               vehicle.RegistrationNumber.ToLower().Replace(" ", "") ==
                               registrationNumber.ToLower().Replace(" ", ""));
 
-        if (matchingRegistrationNumber.Any())
+        if (vehicle is not null)
         {
             ui.ConsoleMessageWriteLine("Registration Number Found In The Garage!");
-
-            foreach (var vehicle in matchingRegistrationNumber)
-            {
-                ui.ConsoleMessageWriteLine(vehicle);
-            }
+            ui.ConsoleMessageWriteLine(vehicle);
+            
         }
         else
-        {
             ui.ConsoleMessageWriteLine($"The Registration Number ({registrationNumber}) Isn't Found In The Garage.");
-        }
     }
 
     public void SearchByProperties(string[] properties)
@@ -170,7 +157,8 @@ public class GarageHandler : IGarageHandler
             ui.ConsoleMessageWriteLine($"One or more property matches this/these vehicles!");
             foreach (var matchedVehicle in matchingVehicles)
             {
-                if (matchedVehicle.GetType().Name == "AvailableParkingSlot")
+               // if (matchedVehicle.GetType().Name == "AvailableParkingSlot")
+                if (matchedVehicle is AvailableParkingSlot)
                 {
                     ui.ConsoleMessageWriteLine($"You've entered an empty value, and that matches: {matchedVehicle}");
                 }

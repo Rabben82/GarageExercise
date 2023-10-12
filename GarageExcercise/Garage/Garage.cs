@@ -17,11 +17,17 @@ public class Garage<T> : IEnumerable<T> where T : Vehicle
     //this method initializes the default cars at runtime
     public void Park(T vehicle)
     {
+        //Check if full
+        //Check if T is null
+        //Ok?
+
         for (int i = 0; i < vehicleArray.Length; i++)
         {
-            if (vehicleArray[i] != null) continue;
-            vehicleArray[i] = vehicle;
-            return;
+            if (vehicleArray[i] == null)
+            {
+                vehicleArray[i] = vehicle;
+                return;
+            }
         }
         // Handle the case where the garage is full 
         throw new ArgumentException("Garage is full!");
@@ -29,10 +35,12 @@ public class Garage<T> : IEnumerable<T> where T : Vehicle
     //this method adds vehicles to an available parkingslot by user input
     public void Park(T vehicle, int index)
     {
+        //Validate T
         vehicleArray[index] = vehicle;
     }
     public void Remove(T vehicle, int index)
     {
+        //Validate T
         vehicleArray[index] = vehicle;
     }
     //I have the logic if i wanna show available parking slots or only showing parked cars in garage handler 

@@ -8,6 +8,12 @@ namespace GarageExercise.Tests
     public class GarageHandlerTests
     {
         [Fact]
+        public void Testing()
+        {
+            var testDemo = new TestDemo();
+        }
+
+        [Fact]
         public void Remove_Vehicle_From_Garage()
         {
             // Arrange
